@@ -24,6 +24,7 @@ async function awaitForm() {
 function autofill() {
 	const now = new Date();
 	const questions = Array.from(document.body.querySelectorAll<HTMLSpanElement>("span.surveyquestion"));
+	const questionCells = Array.from(document.body.querySelectorAll<HTMLTableCellElement>("th.surveyquestioncell"));
 
 	// Auto-fill top date and time box with the current time
 	const topYearSelect = document.querySelector<HTMLSelectElement>("#dsYear");
@@ -151,12 +152,32 @@ function autofill() {
 	} else {
 		console.warn("Ipsos Extension: Could not find address text area.");
 	}
+
+	// Autofill age with stored information
+	const ageYearsQuestion = questionCells.find((question) => question.textContent?.trim().startsWith("2.6.1 "));
+	const ageYearsTextarea = ageYearsQuestion?.parentElement?.querySelector<HTMLTextAreaElement>("textarea");
+	const ageMonthsQuestion = questionCells.find((question) => question.textContent?.trim().startsWith("2.6.2 "));
+	const ageMonthsTextarea = ageMonthsQuestion?.parentElement?.querySelector<HTMLTextAreaElement>("textarea");
+
+	if (ageYearsTextarea && ageMonthsTextarea) {
+		const dob = new Date(2000, 0, 1); // todo storage
+
+		let ageYears = now.getFullYear() - dob.getFullYear();
+		let ageMonths = now.getMonth() - dob.getMonth();
+		if (ageMonths < 0) {
+			ageYears--;
+			ageMonths += 12;
+		}
+
+		ageYearsTextarea.value = String(ageYears).padStart(2, "0");
+		ageMonthsTextarea.value = String(ageMonths).padStart(2, "0");
+	} else {
+		console.warn("Ipsos Extension: Could not find year and/or month age text area.");
+	}
 }
 
 awaitForm();
 
 // todo 1.5 automatically upload id, or link to location may be easier
-// todo 2.6.1 fill with calculated age from stored dob
-// todo 2.6.2 fill with calculated age from stored dob
 // todo storage
 // todo create popup to store data
