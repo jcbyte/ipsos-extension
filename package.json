@@ -20,8 +20,12 @@
 	},
 	"homepage": "https://github.com/jcbyte/ipsos-extension#readme",
 	"devDependencies": {
+		"@preact/preset-vite": "^2.10.2",
 		"@types/chrome": "^0.0.329",
 		"typescript": "^5.8.3",
 		"vite": "^7.0.1"
+	},
+	"dependencies": {
+		"preact": "^10.26.9"
 	}
 }

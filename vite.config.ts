@@ -1,3 +1,4 @@
+import preact from "@preact/preset-vite";
 import { defineConfig } from "vite";
 
 export default defineConfig({
@@ -7,10 +8,12 @@ export default defineConfig({
 			input: {
 				background: "src/background.ts",
 				content: "src/content.ts",
+				popup: "popup.html",
 			},
 			output: {
 				entryFileNames: "[name].js",
 			},
 		},
 	},
+	plugins: [preact()],
 });
