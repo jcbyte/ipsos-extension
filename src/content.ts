@@ -19,40 +19,55 @@ async function autofill() {
 		console.log("Ipsos Extension: DOM loaded, filling now.");
 
 		const now = new Date();
-
-		// todo null checking everywhere
+		const questions = Array.from(document.body.querySelectorAll<HTMLSpanElement>("span.surveyquestion"));
 
 		// Auto-fill top date and time box with the current time
-		const topYearSelect = document.querySelector<HTMLSelectElement>("#dsYear")!;
-		const topMonthSelect = document.querySelector<HTMLSelectElement>("#dsMonth")!;
-		const topDaySelect = document.querySelector<HTMLSelectElement>("#dsDay")!;
-		const topHourSelect = document.querySelector<HTMLSelectElement>("#tsHoursHEAD_TIME")!;
-		const topMinuteSelect = document.querySelector<HTMLSelectElement>("#tsMinutesHEAD_TIME")!;
+		const topYearSelect = document.querySelector<HTMLSelectElement>("#dsYear");
+		const topMonthSelect = document.querySelector<HTMLSelectElement>("#dsMonth");
+		const topDaySelect = document.querySelector<HTMLSelectElement>("#dsDay");
+		const topHourSelect = document.querySelector<HTMLSelectElement>("#tsHoursHEAD_TIME");
+		const topMinuteSelect = document.querySelector<HTMLSelectElement>("#tsMinutesHEAD_TIME");
 
-		topYearSelect.value = now.getFullYear().toString();
-		topMonthSelect.value = now.getMonth().toString();
-		topDaySelect.value = (now.getDate() - 1).toString();
-		topHourSelect.value = now.getHours().toString();
-		topMinuteSelect.value = now.getMinutes().toString();
+		if (topYearSelect && topMonthSelect && topDaySelect) {
+			topYearSelect.value = now.getFullYear().toString();
+			topMonthSelect.value = now.getMonth().toString();
+			topDaySelect.value = (now.getDate() - 1).toString();
+		} else {
+			console.warn("Ipsos Extension: Could not find top date boxes.");
+		}
 
-		const questions = Array.from(document.body.querySelectorAll<HTMLSpanElement>("span.surveyquestion"));
+		if (topHourSelect && topMinuteSelect) {
+			topHourSelect.value = now.getHours().toString();
+			topMinuteSelect.value = now.getMinutes().toString();
+		} else {
+			console.warn("Ipsos Extension: Could not find top time boxes.");
+		}
 
 		// Auto-select yes to confirm information entered is accurate
 		const confirmationQuestion = questions.find((question) => question.textContent?.trim().startsWith("1,1"));
 		const confirmationYesInput =
 			confirmationQuestion?.parentElement?.querySelector<HTMLInputElement>('input[value="1"]');
-		confirmationYesInput?.click();
+
+		if (confirmationYesInput) {
+			confirmationYesInput.click();
+		} else {
+			console.warn("Ipsos Extension: Could not confirmation yes radio button.");
+		}
 
 		// Auto-fill main date with current date
 		const dateQuestion = questions.find((question) => question.textContent?.trim().startsWith("1.2"));
 		const dateInput = dateQuestion?.parentElement?.querySelector("tbody")?.querySelector<HTMLInputElement>("input");
 
-		const day = String(now.getDate()).padStart(2, "0");
-		const month = String(now.getMonth() + 1).padStart(2, "0");
-		const year = now.getFullYear();
-		const formattedDate = `${day}/${month}/${year}`;
+		if (dateInput) {
+			const day = String(now.getDate()).padStart(2, "0");
+			const month = String(now.getMonth() + 1).padStart(2, "0");
+			const year = now.getFullYear();
+			const formattedDate = `${day}/${month}/${year}`;
 
-		dateInput!.value = formattedDate;
+			dateInput.value = formattedDate;
+		} else {
+			console.warn("Ipsos Extension: Could not find date input.");
+		}
 
 		// Auto-fill main time with current time
 		const timeQuestion = questions.find((question) => question.textContent?.trim().startsWith("1.3"));
@@ -60,8 +75,15 @@ async function autofill() {
 			?.querySelector("tbody")
 			?.querySelectorAll<HTMLSelectElement>("select");
 
-		timeInputs![0].value = now.getHours().toString().padStart(2, "0");
-		timeInputs![1].value = now.getMinutes().toString().padStart(2, "0");
+		if (timeInputs && timeInputs.length === 2) {
+			const hourInput = timeInputs[0];
+			const minuteInput = timeInputs[1];
+
+			hourInput.value = now.getHours().toString().padStart(2, "0");
+			minuteInput.value = now.getMinutes().toString().padStart(2, "0");
+		} else {
+			console.warn("Ipsos Extension: Could not find time inputs.");
+		}
 	});
 }
 
