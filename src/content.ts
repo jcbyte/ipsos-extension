@@ -132,17 +132,22 @@ function autofill() {
 		console.warn("Ipsos Extension: Could not find time inputs.");
 	}
 
-	// Sync changes to top date and time with main date and time
-	if (topYearSelect && topMonthSelect && topDaySelect && dateInput) {
+	// Auto-fill postcode with stored information
+	const postcodeQuestion = questions.find((question) => question.textContent?.trim().startsWith("4.1"));
+	const postcodeTextarea = postcodeQuestion?.parentElement?.querySelector<HTMLTextAreaElement>("textarea");
+
+	if (postcodeTextarea) {
+		postcodeTextarea.value = "AA00 0AA (from storage)";
+	} else {
+		console.warn("Ipsos Extension: Could not find postcode text area.");
 	}
 }
 
 awaitForm();
 
-// todo
-// 1.5 automatically upload id, or link to location may be easier
-// 4.1 fill with stored
-// 4.1a fill with stored
-// 2.6.1 fill with calculated age from stored dob
-// 2.6.2 fill with calculated age from stored dob
+// todo 1.5 automatically upload id, or link to location may be easier
+// todo 4.1a fill with stored
+// todo 2.6.1 fill with calculated age from stored dob
+// todo 2.6.2 fill with calculated age from stored dob
+// todo storage
 // todo create popup to store data
