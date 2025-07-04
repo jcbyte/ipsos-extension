@@ -1,3 +1,4 @@
+import { get } from "./storage";
 import { waitForElement } from "./util";
 
 async function awaitForm() {
@@ -21,7 +22,7 @@ async function awaitForm() {
 	});
 }
 
-function autofill() {
+async function autofill() {
 	const now = new Date();
 	const questions = Array.from(document.body.querySelectorAll<HTMLSpanElement>("span.surveyquestion"));
 	const questionCells = Array.from(document.body.querySelectorAll<HTMLTableCellElement>("th.surveyquestioncell"));
@@ -134,64 +135,74 @@ function autofill() {
 	}
 
 	// Copy ID location to clipboard when upload ID button clicked
-	const idQuestion = questions.find((question) => question.textContent?.trim().startsWith("1,5. "));
-	const idUploadButton = idQuestion?.closest("td.surveyquestioncell")?.querySelector("#uploadImgBtn");
+	const idLocation = await get<string>("idLocation");
 
-	if (idUploadButton) {
-		const idLocation = "C:/idhere"; // todo storage
+	if (idLocation) {
+		const idQuestion = questions.find((question) => question.textContent?.trim().startsWith("1,5. "));
+		const idUploadButton = idQuestion?.closest("td.surveyquestioncell")?.querySelector("#uploadImgBtn");
 
-		// Copy ID location to clipboard when clicked
-		idUploadButton.addEventListener("click", () => {
-			navigator.clipboard.writeText(idLocation);
-		});
-	} else {
-		console.warn("Ipsos Extension: Could not find ID upload button.");
+		if (idUploadButton) {
+			// Copy ID location to clipboard when clicked
+			idUploadButton.addEventListener("click", () => {
+				navigator.clipboard.writeText(idLocation);
+			});
+		} else {
+			console.warn("Ipsos Extension: Could not find ID upload button.");
+		}
 	}
 
 	// Auto-fill postcode with stored information
-	const postcodeQuestion = questions.find((question) => question.textContent?.trim().startsWith("4.1. "));
-	const postcodeTextarea = postcodeQuestion?.parentElement?.querySelector<HTMLTextAreaElement>("textarea");
+	const postcode = await get<string>("postcode");
 
-	if (postcodeTextarea) {
-		postcodeTextarea.value = "AA00 0AA (from storage)"; // todo storage
-	} else {
-		console.warn("Ipsos Extension: Could not find postcode text area.");
+	if (postcode) {
+		const postcodeQuestion = questions.find((question) => question.textContent?.trim().startsWith("4.1. "));
+		const postcodeTextarea = postcodeQuestion?.parentElement?.querySelector<HTMLTextAreaElement>("textarea");
+
+		if (postcodeTextarea) {
+			postcodeTextarea.value = postcode;
+		} else {
+			console.warn("Ipsos Extension: Could not find postcode text area.");
+		}
 	}
 
 	// Auto-fill address with stored information
-	const addressQuestion = questions.find((question) => question.textContent?.trim().startsWith("4.1a. "));
-	const addressTextarea = addressQuestion?.parentElement?.querySelector<HTMLTextAreaElement>("textarea");
+	const address = await get<string>("address");
 
-	if (addressTextarea) {
-		addressTextarea.value = "0 Address Lane (from storage)"; // todo storage
-	} else {
-		console.warn("Ipsos Extension: Could not find address text area.");
-	}
+	if (address) {
+		const addressQuestion = questions.find((question) => question.textContent?.trim().startsWith("4.1a. "));
+		const addressTextarea = addressQuestion?.parentElement?.querySelector<HTMLTextAreaElement>("textarea");
 
-	// Autofill age with stored information
-	const ageYearsQuestion = questionCells.find((question) => question.textContent?.trim().startsWith("2.6.1 "));
-	const ageYearsTextarea = ageYearsQuestion?.parentElement?.querySelector<HTMLTextAreaElement>("textarea");
-	const ageMonthsQuestion = questionCells.find((question) => question.textContent?.trim().startsWith("2.6.2 "));
-	const ageMonthsTextarea = ageMonthsQuestion?.parentElement?.querySelector<HTMLTextAreaElement>("textarea");
-
-	if (ageYearsTextarea && ageMonthsTextarea) {
-		const dob = new Date(2000, 0, 1); // todo storage
-
-		let ageYears = now.getFullYear() - dob.getFullYear();
-		let ageMonths = now.getMonth() - dob.getMonth();
-		if (ageMonths < 0) {
-			ageYears--;
-			ageMonths += 12;
+		if (addressTextarea) {
+			addressTextarea.value = address;
+		} else {
+			console.warn("Ipsos Extension: Could not find address text area.");
 		}
+	}
+	// Autofill age with stored information
+	const dob = await get<Date>("dob");
 
-		ageYearsTextarea.value = String(ageYears).padStart(2, "0");
-		ageMonthsTextarea.value = String(ageMonths).padStart(2, "0");
-	} else {
-		console.warn("Ipsos Extension: Could not find year and/or month age text area.");
+	if (dob) {
+		const ageYearsQuestion = questionCells.find((question) => question.textContent?.trim().startsWith("2.6.1 "));
+		const ageYearsTextarea = ageYearsQuestion?.parentElement?.querySelector<HTMLTextAreaElement>("textarea");
+		const ageMonthsQuestion = questionCells.find((question) => question.textContent?.trim().startsWith("2.6.2 "));
+		const ageMonthsTextarea = ageMonthsQuestion?.parentElement?.querySelector<HTMLTextAreaElement>("textarea");
+
+		if (ageYearsTextarea && ageMonthsTextarea) {
+			let ageYears = now.getFullYear() - dob.getFullYear();
+			let ageMonths = now.getMonth() - dob.getMonth();
+			if (ageMonths < 0) {
+				ageYears--;
+				ageMonths += 12;
+			}
+
+			ageYearsTextarea.value = String(ageYears).padStart(2, "0");
+			ageMonthsTextarea.value = String(ageMonths).padStart(2, "0");
+		} else {
+			console.warn("Ipsos Extension: Could not find year and/or month age text area.");
+		}
 	}
 }
 
 awaitForm();
 
-// todo storage
 // todo create popup to store data
