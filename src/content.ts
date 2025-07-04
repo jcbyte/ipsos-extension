@@ -1,5 +1,5 @@
-import { get } from "./storage";
-import { waitForElement } from "./util";
+import { get } from "@/util/storage";
+import { waitForElement } from "@/util/util";
 
 async function awaitForm() {
 	// Wait for the correct form to be shown
@@ -204,5 +204,3 @@ async function autofill() {
 }
 
 awaitForm();
-
-// todo create popup to store data

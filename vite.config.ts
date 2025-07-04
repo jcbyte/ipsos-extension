@@ -1,4 +1,6 @@
 import preact from "@preact/preset-vite";
+import { resolve } from "path";
+
 import { defineConfig } from "vite";
 
 export default defineConfig({
@@ -6,7 +8,6 @@ export default defineConfig({
 		outDir: "dist",
 		rollupOptions: {
 			input: {
-				background: "src/background.ts",
 				content: "src/content.ts",
 				popup: "popup.html",
 			},
@@ -16,4 +17,9 @@ export default defineConfig({
 		},
 	},
 	plugins: [preact()],
+	resolve: {
+		alias: {
+			"@": resolve(__dirname, "src"),
+		},
+	},
 });
