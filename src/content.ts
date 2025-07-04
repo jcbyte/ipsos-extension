@@ -1,49 +1,56 @@
 import { waitForElement } from "./util";
 
 async function autofill() {
-	// Auto-fill top date and time box with the current time
-	const topYearSelect = await waitForElement<HTMLSelectElement>("#dsYear");
-	const topMonthSelect = await waitForElement<HTMLSelectElement>("#dsMonth");
-	const topDaySelect = await waitForElement<HTMLSelectElement>("#dsDay");
-	const topHourSelect = await waitForElement<HTMLSelectElement>("#tsHoursHEAD_TIME");
-	const topMinuteSelect = await waitForElement<HTMLSelectElement>("#tsMinutesHEAD_TIME");
+	// Wait for the correct form to be shown
+	await waitForElement(() => {
+		const title = document.body.querySelector("h1.surveytitle");
+		console.log(title);
 
-	const now = new Date();
-	topYearSelect.value = now.getFullYear().toString();
-	topMonthSelect.value = now.getMonth().toString();
-	topDaySelect.value = (now.getDate() - 1).toString();
-	topHourSelect.value = now.getHours().toString();
-	topMinuteSelect.value = now.getMinutes().toString();
+		if (title?.textContent?.startsWith("Retail Home Delivery")) {
+			return title;
+		}
 
-	// Auto-select yes to confirm information entered is accurate
-	const confirmInformationInput = await waitForElement(() => {
-		const labels = document.body.querySelectorAll<HTMLSpanElement>("span.surveyansweroption");
-
-		const targetLabel = Array.from(labels).find(
-			(span) => span.textContent?.trim() === "Yes, I understand and all information submitted is correct"
-		);
-
-		const targetInput = targetLabel?.parentElement?.querySelector("input");
-		return targetInput ?? null;
-	});
-	confirmInformationInput.click();
-
-	// Auto-fill main date with current date
-	const dateInput = await waitForElement(() => {
-		const questions = document.body.querySelectorAll<HTMLSpanElement>("span.surveyquestion");
-
-		const targetQuestion = Array.from(questions).find((question) => question.textContent?.trim().startsWith("1.2"));
-
-		const targetInput = targetQuestion?.parentElement?.querySelector("tbody")?.querySelector("input");
-		return targetInput ?? null;
+		return null;
 	});
 
-	const day = String(now.getDate()).padStart(2, "0");
-	const month = String(now.getMonth() + 1).padStart(2, "0");
-	const year = now.getFullYear();
-	const formattedDate = `${day}/${month}/${year}`;
+	// Once everything is loaded then fill it
+	window.addEventListener("load", () => {
+		const now = new Date();
 
-	dateInput.value = formattedDate;
+		// todo null checking everywhere
+
+		// Auto-fill top date and time box with the current time
+		const topYearSelect = document.querySelector<HTMLSelectElement>("#dsYear")!;
+		const topMonthSelect = document.querySelector<HTMLSelectElement>("#dsMonth")!;
+		const topDaySelect = document.querySelector<HTMLSelectElement>("#dsDay")!;
+		const topHourSelect = document.querySelector<HTMLSelectElement>("#tsHoursHEAD_TIME")!;
+		const topMinuteSelect = document.querySelector<HTMLSelectElement>("#tsMinutesHEAD_TIME")!;
+
+		topYearSelect.value = now.getFullYear().toString();
+		topMonthSelect.value = now.getMonth().toString();
+		topDaySelect.value = (now.getDate() - 1).toString();
+		topHourSelect.value = now.getHours().toString();
+		topMinuteSelect.value = now.getMinutes().toString();
+
+		const questions = Array.from(document.body.querySelectorAll<HTMLSpanElement>("span.surveyquestion"));
+
+		// Auto-select yes to confirm information entered is accurate
+		const confirmationQuestion = questions.find((question) => question.textContent?.trim().startsWith("1,1"));
+		const confirmationYesInput =
+			confirmationQuestion?.parentElement?.querySelector<HTMLInputElement>('input[value="1"]');
+		confirmationYesInput?.click();
+
+		// Auto-fill main date with current date
+		const dateQuestion = questions.find((question) => question.textContent?.trim().startsWith("1.2"));
+		const dateInput = dateQuestion?.parentElement?.querySelector("tbody")?.querySelector("input");
+
+		const day = String(now.getDate()).padStart(2, "0");
+		const month = String(now.getMonth() + 1).padStart(2, "0");
+		const year = now.getFullYear();
+		const formattedDate = `${day}/${month}/${year}`;
+
+		dateInput!.value = formattedDate;
+	});
 }
 
 autofill();
