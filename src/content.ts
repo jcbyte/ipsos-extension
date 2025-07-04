@@ -48,7 +48,7 @@ function autofill() {
 	}
 
 	// Auto-select yes to confirm information entered is accurate
-	const confirmationQuestion = questions.find((question) => question.textContent?.trim().startsWith("1,1"));
+	const confirmationQuestion = questions.find((question) => question.textContent?.trim().startsWith("1,1. "));
 	const confirmationYesInput = confirmationQuestion?.parentElement?.querySelector<HTMLInputElement>('input[value="1"]');
 
 	if (confirmationYesInput) {
@@ -58,7 +58,7 @@ function autofill() {
 	}
 
 	// Auto-fill main date with current date
-	const dateQuestion = questions.find((question) => question.textContent?.trim().startsWith("1.2"));
+	const dateQuestion = questions.find((question) => question.textContent?.trim().startsWith("1.2. "));
 	const dateInput = dateQuestion?.parentElement?.querySelector("tbody")?.querySelector<HTMLInputElement>("input");
 
 	if (dateInput) {
@@ -102,7 +102,7 @@ function autofill() {
 	}
 
 	// Auto-fill main time with current time
-	const timeQuestion = questions.find((question) => question.textContent?.trim().startsWith("1.3"));
+	const timeQuestion = questions.find((question) => question.textContent?.trim().startsWith("1.3. "));
 	const timeSelects = timeQuestion?.parentElement
 		?.querySelector("tbody")
 		?.querySelectorAll<HTMLSelectElement>("select");
@@ -133,20 +133,29 @@ function autofill() {
 	}
 
 	// Auto-fill postcode with stored information
-	const postcodeQuestion = questions.find((question) => question.textContent?.trim().startsWith("4.1"));
+	const postcodeQuestion = questions.find((question) => question.textContent?.trim().startsWith("4.1. "));
 	const postcodeTextarea = postcodeQuestion?.parentElement?.querySelector<HTMLTextAreaElement>("textarea");
 
 	if (postcodeTextarea) {
-		postcodeTextarea.value = "AA00 0AA (from storage)";
+		postcodeTextarea.value = "AA00 0AA (from storage)"; // todo storage
 	} else {
 		console.warn("Ipsos Extension: Could not find postcode text area.");
+	}
+
+	// Auto-fill address with stored information
+	const addressQuestion = questions.find((question) => question.textContent?.trim().startsWith("4.1a. "));
+	const addressTextarea = addressQuestion?.parentElement?.querySelector<HTMLTextAreaElement>("textarea");
+
+	if (addressTextarea) {
+		addressTextarea.value = "0 Address Lane (from storage)"; // todo storage
+	} else {
+		console.warn("Ipsos Extension: Could not find address text area.");
 	}
 }
 
 awaitForm();
 
 // todo 1.5 automatically upload id, or link to location may be easier
-// todo 4.1a fill with stored
 // todo 2.6.1 fill with calculated age from stored dob
 // todo 2.6.2 fill with calculated age from stored dob
 // todo storage
