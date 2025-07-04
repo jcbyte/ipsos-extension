@@ -133,6 +133,21 @@ function autofill() {
 		console.warn("Ipsos Extension: Could not find time inputs.");
 	}
 
+	// Copy ID location to clipboard when upload ID button clicked
+	const idQuestion = questions.find((question) => question.textContent?.trim().startsWith("1,5. "));
+	const idUploadButton = idQuestion?.closest("td.surveyquestioncell")?.querySelector("#uploadImgBtn");
+
+	if (idUploadButton) {
+		const idLocation = "C:/idhere"; // todo storage
+
+		// Copy ID location to clipboard when clicked
+		idUploadButton.addEventListener("click", () => {
+			navigator.clipboard.writeText(idLocation);
+		});
+	} else {
+		console.warn("Ipsos Extension: Could not find ID upload button.");
+	}
+
 	// Auto-fill postcode with stored information
 	const postcodeQuestion = questions.find((question) => question.textContent?.trim().startsWith("4.1. "));
 	const postcodeTextarea = postcodeQuestion?.parentElement?.querySelector<HTMLTextAreaElement>("textarea");
@@ -178,6 +193,5 @@ function autofill() {
 
 awaitForm();
 
-// todo 1.5 automatically upload id, or link to location may be easier
 // todo storage
 // todo create popup to store data
