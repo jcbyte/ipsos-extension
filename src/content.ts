@@ -4,7 +4,6 @@ async function autofill() {
 	// Wait for the correct form to be shown
 	await waitForElement(() => {
 		const title = document.body.querySelector("h1.surveytitle");
-		console.log(title);
 
 		if (title?.textContent?.startsWith("Retail Home Delivery")) {
 			return title;
@@ -13,8 +12,12 @@ async function autofill() {
 		return null;
 	});
 
+	console.log("Ipsos Extension: 'Retail Home Delivery' form found.");
+
 	// Once everything is loaded then fill it
 	window.addEventListener("load", () => {
+		console.log("Ipsos Extension: DOM loaded, filling now.");
+
 		const now = new Date();
 
 		// todo null checking everywhere
@@ -42,7 +45,7 @@ async function autofill() {
 
 		// Auto-fill main date with current date
 		const dateQuestion = questions.find((question) => question.textContent?.trim().startsWith("1.2"));
-		const dateInput = dateQuestion?.parentElement?.querySelector("tbody")?.querySelector("input");
+		const dateInput = dateQuestion?.parentElement?.querySelector("tbody")?.querySelector<HTMLInputElement>("input");
 
 		const day = String(now.getDate()).padStart(2, "0");
 		const month = String(now.getMonth() + 1).padStart(2, "0");
@@ -50,13 +53,21 @@ async function autofill() {
 		const formattedDate = `${day}/${month}/${year}`;
 
 		dateInput!.value = formattedDate;
+
+		// Auto-fill main time with current time
+		const timeQuestion = questions.find((question) => question.textContent?.trim().startsWith("1.3"));
+		const timeInputs = timeQuestion?.parentElement
+			?.querySelector("tbody")
+			?.querySelectorAll<HTMLSelectElement>("select");
+
+		timeInputs![0].value = now.getHours().toString().padStart(2, "0");
+		timeInputs![1].value = now.getMinutes().toString().padStart(2, "0");
 	});
 }
 
 autofill();
 
 // todo
-// 1.3 fill time with current
 // copy date and times across
 // 1.5 automatically upload id, or link to location may be easier
 // 4.1 fill with stored
