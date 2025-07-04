@@ -17,7 +17,7 @@ async function autofill() {
 
 	// Auto-select yes to confirm information entered is accurate
 	const confirmInformationInput = await waitForElement(() => {
-		const labels = document.body.querySelectorAll("span.surveyansweroption");
+		const labels = document.body.querySelectorAll<HTMLSpanElement>("span.surveyansweroption");
 
 		const targetLabel = Array.from(labels).find(
 			(span) => span.textContent?.trim() === "Yes, I understand and all information submitted is correct"
@@ -28,18 +28,29 @@ async function autofill() {
 	});
 	confirmInformationInput.click();
 
-	// Auto-fill main date and time box with current time
-	// todo
+	// Auto-fill main date with current date
+	const dateInput = await waitForElement(() => {
+		const questions = document.body.querySelectorAll<HTMLSpanElement>("span.surveyquestion");
+
+		const targetQuestion = Array.from(questions).find((question) => question.textContent?.trim().startsWith("1.2"));
+
+		const targetInput = targetQuestion?.parentElement?.querySelector("tbody")?.querySelector("input");
+		return targetInput ?? null;
+	});
+
+	const day = String(now.getDate()).padStart(2, "0");
+	const month = String(now.getMonth() + 1).padStart(2, "0");
+	const year = now.getFullYear();
+	const formattedDate = `${day}/${month}/${year}`;
+
+	dateInput.value = formattedDate;
 }
 
 autofill();
 
 // todo
-// // 0.1 fill date with current
-// //; 0.2 fill time with current
-// // 1.1 select yes
-// 1.2 fill date with current (copy this to 0.1 or vice versa)
-// 1.3 fill time with current (copy this to 0.2 or vice versa)
+// 1.3 fill time with current
+// copy date and times across
 // 1.5 automatically upload id, or link to location may be easier
 // 4.1 fill with stored
 // 4.1a fill with stored
