@@ -1,6 +1,7 @@
 import preact from "@preact/preset-vite";
 import { resolve } from "path";
 
+import tailwindcss from "@tailwindcss/vite";
 import { defineConfig } from "vite";
 
 export default defineConfig({
@@ -16,7 +17,7 @@ export default defineConfig({
 			},
 		},
 	},
-	plugins: [preact()],
+	plugins: [preact(), tailwindcss()],
 	resolve: {
 		alias: {
 			"@": resolve(__dirname, "src"),

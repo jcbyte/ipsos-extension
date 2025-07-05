@@ -178,6 +178,7 @@ async function autofill() {
 			console.warn("Ipsos Extension: Could not find address text area.");
 		}
 	}
+
 	// Autofill age with stored information
 	const dob = await get<Date>("dob");
 
