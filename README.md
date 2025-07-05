@@ -2,7 +2,7 @@
 
 Ipsos Extension is for automating parts of form filling and streamlining survey processes for [ishopforipsos](https://uk.ishopforipsos.com/).
 
-<img src="demo.png" alt="Description" width="250" />
+<img src="demo.png" alt="Description" width="300" />
 
 Currently supported Forms:
 
