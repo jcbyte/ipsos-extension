@@ -1,5 +1,6 @@
 import { getSetting, getSettings } from "@/util/storage";
 import { waitForElement } from "@/util/util";
+import DateDiff from "date-diff";
 
 async function awaitForm() {
 	// Wait for the correct form to be shown
@@ -236,15 +237,10 @@ async function autofill() {
 			const ageMonthsTextarea = ageMonthsQuestion?.parentElement?.querySelector<HTMLTextAreaElement>("textarea");
 
 			if (ageYearsTextarea && ageMonthsTextarea) {
-				let ageYears = now.getFullYear() - dob.getFullYear();
-				let ageMonths = now.getMonth() - dob.getMonth();
-				if (ageMonths < 0) {
-					ageYears--;
-					ageMonths += 12;
-				}
+				const age = new DateDiff(now, dob);
 
-				ageYearsTextarea.value = String(ageYears).padStart(2, "0");
-				ageMonthsTextarea.value = String(ageMonths).padStart(2, "0");
+				ageYearsTextarea.value = String(Math.floor(age.years())).padStart(2, "0");
+				ageMonthsTextarea.value = String(Math.floor(age.months()) % 12).padStart(2, "0");
 			} else {
 				console.warn("Ipsos Extension: Could not find year and/or month age text area.");
 			}
