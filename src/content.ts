@@ -215,34 +215,31 @@ async function autofill() {
 		}
 	}
 
-	console.log("1");
-	console.log("2", await getSetting("dob.value"));
-	console.log("3", settings);
-	console.log("4", new Date(await getSetting("dob.value")));
-
 	// Autofill age with stored information
 	if (settings["dob.enabled"]) {
 		const dob = new Date(await getSetting("dob.value"));
 
-		console.log(dob);
+		if (!Number.isNaN(dob.getTime())) {
+			const ageYearsQuestion = questionCells.find((question) => question.textContent?.trim().startsWith("2.6.1 "));
+			const ageYearsTextarea = ageYearsQuestion?.parentElement?.querySelector<HTMLTextAreaElement>("textarea");
+			const ageMonthsQuestion = questionCells.find((question) => question.textContent?.trim().startsWith("2.6.2 "));
+			const ageMonthsTextarea = ageMonthsQuestion?.parentElement?.querySelector<HTMLTextAreaElement>("textarea");
 
-		const ageYearsQuestion = questionCells.find((question) => question.textContent?.trim().startsWith("2.6.1 "));
-		const ageYearsTextarea = ageYearsQuestion?.parentElement?.querySelector<HTMLTextAreaElement>("textarea");
-		const ageMonthsQuestion = questionCells.find((question) => question.textContent?.trim().startsWith("2.6.2 "));
-		const ageMonthsTextarea = ageMonthsQuestion?.parentElement?.querySelector<HTMLTextAreaElement>("textarea");
+			if (ageYearsTextarea && ageMonthsTextarea) {
+				let ageYears = now.getFullYear() - dob.getFullYear();
+				let ageMonths = now.getMonth() - dob.getMonth();
+				if (ageMonths < 0) {
+					ageYears--;
+					ageMonths += 12;
+				}
 
-		if (ageYearsTextarea && ageMonthsTextarea) {
-			let ageYears = now.getFullYear() - dob.getFullYear();
-			let ageMonths = now.getMonth() - dob.getMonth();
-			if (ageMonths < 0) {
-				ageYears--;
-				ageMonths += 12;
+				ageYearsTextarea.value = String(ageYears).padStart(2, "0");
+				ageMonthsTextarea.value = String(ageMonths).padStart(2, "0");
+			} else {
+				console.warn("Ipsos Extension: Could not find year and/or month age text area.");
 			}
-
-			ageYearsTextarea.value = String(ageYears).padStart(2, "0");
-			ageMonthsTextarea.value = String(ageMonths).padStart(2, "0");
 		} else {
-			console.warn("Ipsos Extension: Could not find year and/or month age text area.");
+			console.warn("Ipsos Extension: Auto-fill age is enabled, but DOB is invalid.");
 		}
 	}
 }
