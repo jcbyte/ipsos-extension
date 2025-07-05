@@ -13,7 +13,7 @@
 	"content_scripts": [
 		{
 			"matches": ["https://uk.ishopforipsos.com/*"],
-			"js": ["content.js"],
+			"js": ["content/content.js"],
 			"run_at": "document_idle",
 			"all_frames": true
 		}

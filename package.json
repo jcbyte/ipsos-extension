@@ -4,8 +4,8 @@
 	"description": "",
 	"main": "index.js",
 	"scripts": {
-		"dev": "vite build --watch",
-		"build": "vite build"
+		"dev": "concurrently \"vite build --mode content --watch\" \"vite build --mode popup --watch\"",
+		"build": "concurrently \"vite build --mode content\" \"vite build --mode popup\""
 	},
 	"repository": {
 		"type": "git",
@@ -24,6 +24,8 @@
 		"@tailwindcss/vite": "^4.1.11",
 		"@types/chrome": "^0.0.329",
 		"@types/node": "^24.0.10",
+		"concurrently": "^9.2.0",
+		"rollup-plugin-copy": "^3.5.0",
 		"tailwindcss": "^4.1.11",
 		"tw-animate-css": "^1.3.5",
 		"typescript": "^5.8.3",
