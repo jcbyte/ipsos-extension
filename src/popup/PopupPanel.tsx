@@ -5,8 +5,6 @@ import { Switch } from "@/components/ui/switch";
 import { getSetting, getSettings, setSetting } from "@/util/storage";
 import { useEffect, useState } from "preact/hooks";
 
-// todo get version number
-
 export default function PopupPanel() {
 	const [useDateEnabled, setUseDateEnabled] = useState<boolean>(false);
 
@@ -221,7 +219,7 @@ export default function PopupPanel() {
 			<Separator />
 
 			<div class="flex flex-col gap-0 items-center">
-				<span class="text-muted-foreground text-sm text-center">Version X.X.X</span>
+				<span class="text-muted-foreground text-sm text-center">Version {__APP_VERSION__}</span>
 				<span class="text-muted-foreground text-sm text-center">Made by Joel</span>
 			</div>
 		</div>

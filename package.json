@@ -2,7 +2,6 @@
 	"name": "ipsos-extension",
 	"version": "1.0.0",
 	"description": "",
-	"main": "index.js",
 	"scripts": {
 		"dev": "concurrently \"vite build --mode content --watch\" \"vite build --mode popup --watch\"",
 		"build": "concurrently \"vite build --mode content\" \"vite build --mode popup\""

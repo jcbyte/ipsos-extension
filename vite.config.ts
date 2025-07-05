@@ -2,12 +2,16 @@ import preact from "@preact/preset-vite";
 import tailwindcss from "@tailwindcss/vite";
 import { resolve } from "path";
 import { defineConfig, UserConfig } from "vite";
+import pkg from "./package.json";
 
 const baseConfig: UserConfig = {
 	resolve: {
 		alias: {
 			"@": resolve(__dirname, "src"),
 		},
+	},
+	define: {
+		__APP_VERSION__: JSON.stringify(pkg.version),
 	},
 };
 
