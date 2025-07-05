@@ -23,6 +23,8 @@ async function awaitForm() {
 	});
 }
 
+// todo do not set if there is already a value there
+
 async function autofill() {
 	const settings = await getSettings([
 		"date.enabled",
@@ -36,6 +38,8 @@ async function autofill() {
 	const now = new Date();
 	const questions = Array.from(document.body.querySelectorAll<HTMLSpanElement>("span.surveyquestion"));
 	const questionCells = Array.from(document.body.querySelectorAll<HTMLTableCellElement>("th.surveyquestioncell"));
+
+	let isTimeSyncing = false;
 
 	// Auto-fill top date and time box with the current time
 	let topYearSelect: HTMLSelectElement | null = null;
@@ -55,15 +59,20 @@ async function autofill() {
 	if (settings["date.enabled"]) {
 		if (topYearSelect && topMonthSelect && topDaySelect) {
 			topYearSelect.value = now.getFullYear().toString();
+			topYearSelect.dispatchEvent(new Event("change"));
 			topMonthSelect.value = now.getMonth().toString();
+			topMonthSelect.dispatchEvent(new Event("change"));
 			topDaySelect.value = (now.getDate() - 1).toString();
+			topDaySelect.dispatchEvent(new Event("change"));
 		} else {
 			console.warn("Ipsos Extension: Could not find top date boxes.");
 		}
 
 		if (topHourSelect && topMinuteSelect) {
 			topHourSelect.value = now.getHours().toString();
+			topHourSelect.dispatchEvent(new Event("change"));
 			topMinuteSelect.value = now.getMinutes().toString();
+			topMinuteSelect.dispatchEvent(new Event("change"));
 		} else {
 			console.warn("Ipsos Extension: Could not find top time boxes.");
 		}
@@ -109,14 +118,18 @@ async function autofill() {
 			const year = now.getFullYear();
 			const formattedDate = `${day}/${month}/${year}`;
 
+			// todo this doesn't seem to work
 			dateInput.value = formattedDate;
+			dateInput.dispatchEvent(new Event("change"));
 		} else {
 			console.warn("Ipsos Extension: Could not find date input.");
 		}
 
 		if (hourSelect && minuteSelect) {
 			hourSelect.value = now.getHours().toString().padStart(2, "0");
+			hourSelect.dispatchEvent(new Event("change"));
 			minuteSelect.value = now.getMinutes().toString().padStart(2, "0");
+			minuteSelect.dispatchEvent(new Event("change"));
 		} else {
 			console.warn("Ipsos Extension: Could not find time inputs.");
 		}
@@ -132,9 +145,14 @@ async function autofill() {
 					lastDateInputValue = dateInput.value;
 					const [day, month, year] = dateInput.value.split("/");
 
+					isTimeSyncing = true;
 					topYearSelect.value = year;
+					topYearSelect.dispatchEvent(new Event("change"));
 					topMonthSelect.value = String(Number(month) - 1);
+					topMonthSelect.dispatchEvent(new Event("change"));
 					topDaySelect.value = String(Number(day) - 1);
+					topDaySelect.dispatchEvent(new Event("change"));
+					isTimeSyncing = false;
 				}
 			}, 100);
 
@@ -144,7 +162,11 @@ async function autofill() {
 				const year = topYearSelect.value;
 				const formattedDate = `${day}/${month}/${year}`;
 
+				// todo this doesn't seem to work?
 				dateInput.value = formattedDate;
+				isTimeSyncing = true;
+				dateInput.dispatchEvent(new Event("change"));
+				isTimeSyncing = false;
 			};
 
 			topYearSelect.addEventListener("change", updateDateInput);
@@ -157,27 +179,47 @@ async function autofill() {
 		// Sync changes with top time
 		if (hourSelect && minuteSelect && topHourSelect && topMinuteSelect) {
 			hourSelect.addEventListener("change", (e) => {
+				if (isTimeSyncing) return;
+
 				const newValue = (e.target as HTMLSelectElement).value;
 				const formattedValue = newValue.replace(/^0+/, "") || "0";
 				topHourSelect.value = formattedValue;
+				isTimeSyncing = true;
+				topHourSelect.dispatchEvent(new Event("change"));
+				isTimeSyncing = false;
 			});
 
 			topHourSelect.addEventListener("change", (e) => {
+				if (isTimeSyncing) return;
+
 				const newValue = (e.target as HTMLSelectElement).value;
 				const formattedValue = newValue.padStart(2, "0");
 				hourSelect.value = formattedValue;
+				isTimeSyncing = true;
+				hourSelect.dispatchEvent(new Event("change"));
+				isTimeSyncing = false;
 			});
 
 			minuteSelect.addEventListener("change", (e) => {
+				if (isTimeSyncing) return;
+
 				const newValue = (e.target as HTMLSelectElement).value;
 				const formattedValue = newValue.replace(/^0+/, "") || "0";
 				topMinuteSelect.value = formattedValue;
+				isTimeSyncing = true;
+				topMinuteSelect.dispatchEvent(new Event("change"));
+				isTimeSyncing = false;
 			});
 
 			topMinuteSelect.addEventListener("change", (e) => {
+				if (isTimeSyncing) return;
+
 				const newValue = (e.target as HTMLSelectElement).value;
 				const formattedValue = newValue.padStart(2, "0");
 				minuteSelect.value = formattedValue;
+				isTimeSyncing = true;
+				minuteSelect.dispatchEvent(new Event("change"));
+				isTimeSyncing = false;
 			});
 		} else {
 			console.warn("Ipsos Extension: Could not find top time boxes or time inputs (for syncing).");

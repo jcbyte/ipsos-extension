@@ -5,6 +5,8 @@ import { Switch } from "@/components/ui/switch";
 import { getSetting, getSettings, setSetting } from "@/util/storage";
 import { useEffect, useState } from "preact/hooks";
 
+// todo show tooltip on certain sections
+
 export default function PopupPanel() {
 	const [useDateEnabled, setUseDateEnabled] = useState<boolean>(false);
 
