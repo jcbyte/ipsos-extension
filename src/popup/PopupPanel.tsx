@@ -3,9 +3,8 @@ import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
 import { Switch } from "@/components/ui/switch";
 import { getSetting, getSettings, setSetting } from "@/util/storage";
+import { TriangleAlert } from "lucide-react";
 import { useEffect, useState } from "preact/hooks";
-
-// todo show tooltip on certain sections
 
 export default function PopupPanel() {
 	const [useDateEnabled, setUseDateEnabled] = useState<boolean>(false);
@@ -117,16 +116,16 @@ export default function PopupPanel() {
 	}
 
 	return (
-		<div class="min-w-[22rem] p-6 flex flex-col gap-4">
-			<div class="flex flex-col gap-1 items-center">
-				<span class="text-xl font-bold text-center">Ipsos Extension</span>
-				<span class="text-muted-foreground text-sm text-center">
+		<div className="min-w-96 p-6 flex flex-col gap-4">
+			<div className="flex flex-col gap-1 items-center">
+				<span className="text-xl font-bold text-center">Ipsos Extension</span>
+				<span className="text-muted-foreground text-sm text-center">
 					Ipsos Extension is for automating parts of form filling and streamlining survey processes for&nbsp;
 					<a
 						href="https://uk.ishopforipsos.com/"
 						target="_blank"
 						rel="noopener noreferrer"
-						class="underline underline-offset-1"
+						className="underline underline-offset-1"
 					>
 						ishopforipsos
 					</a>
@@ -136,7 +135,7 @@ export default function PopupPanel() {
 
 			<Separator />
 
-			<div class="flex flex-col gap-4">
+			<div className="flex flex-col gap-4">
 				{/* Auto-fill date and time toggle */}
 				<div className="flex items-center justify-between gap-2">
 					<Label htmlFor="auto-fill-date-toggle">Auto-fill Date & Time</Label>
@@ -150,13 +149,24 @@ export default function PopupPanel() {
 				</div>
 
 				{/* Auto-confirm accuracy statement toggle */}
-				<div className="flex items-center justify-between gap-2">
-					<Label htmlFor="auto-agree-accuracy-toggle">Auto-agree to Accuracy Statement</Label>
-					<Switch
-						id="auto-agree-accuracy-toggle"
-						checked={agreeAccuracyEnabled}
-						onCheckedChange={handleAutoAgreeAccuracyToggle}
-					/>
+				<div className="flex flex-col gap-0">
+					<div className="flex items-center justify-between gap-2">
+						<Label htmlFor="auto-agree-accuracy-toggle">Auto-agree to Accuracy Statement</Label>
+						<Switch
+							id="auto-agree-accuracy-toggle"
+							checked={agreeAccuracyEnabled}
+							onCheckedChange={handleAutoAgreeAccuracyToggle}
+						/>
+					</div>
+					{agreeAccuracyEnabled && (
+						<div className="flex items-center gap-2">
+							<TriangleAlert className="text-destructive" size={28} />
+							<span className="text-destructive text-xs">
+								By enabling this option, you confirm that you are responsible for the accuracy of all submitted
+								information.
+							</span>
+						</div>
+					)}
 				</div>
 
 				{/* ID file location input */}
@@ -213,8 +223,8 @@ export default function PopupPanel() {
 						<Switch id="dob-toggle" checked={autofillAgeEnabled} onCheckedChange={handleAutofillAgeToggle} />
 					</div>
 					{autofillAgeEnabled && (
-						<div class="flex flex-col gap-1">
-							<span class="text-muted-foreground text-xs pl-1">Enter date of birth</span>
+						<div className="flex flex-col gap-1">
+							<span className="text-muted-foreground text-xs pl-1">Enter date of birth</span>
 							<Input
 								type="date"
 								id="dob-input"
@@ -229,9 +239,9 @@ export default function PopupPanel() {
 
 			<Separator />
 
-			<div class="flex flex-col gap-0 items-center">
-				<span class="text-muted-foreground text-sm text-center">Version {__APP_VERSION__}</span>
-				<span class="text-muted-foreground text-sm text-center">Made by Joel Cutler</span>
+			<div className="flex flex-col gap-0 items-center">
+				<span className="text-muted-foreground text-sm text-center">Version {__APP_VERSION__}</span>
+				<span className="text-muted-foreground text-sm text-center">Made by Joel Cutler</span>
 			</div>
 		</div>
 	);
