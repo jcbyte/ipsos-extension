@@ -167,7 +167,17 @@ async function autofill() {
 				hourSelect.value = formattedValue;
 			});
 
-			// todo minute select?
+			minuteSelect.addEventListener("change", (e) => {
+				const newValue = (e.target as HTMLSelectElement).value;
+				const formattedValue = newValue.replace(/^0+/, "") || "0";
+				topMinuteSelect.value = formattedValue;
+			});
+
+			topMinuteSelect.addEventListener("change", (e) => {
+				const newValue = (e.target as HTMLSelectElement).value;
+				const formattedValue = newValue.padStart(2, "0");
+				minuteSelect.value = formattedValue;
+			});
 		} else {
 			console.warn("Ipsos Extension: Could not find top time boxes or time inputs (for syncing).");
 		}
