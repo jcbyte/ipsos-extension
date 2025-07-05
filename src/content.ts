@@ -1,4 +1,3 @@
-import { get } from "@/util/storage";
 import { waitForElement } from "@/util/util";
 
 async function awaitForm() {
@@ -23,6 +22,9 @@ async function awaitForm() {
 }
 
 async function autofill() {
+	// const settings = await getSettings(["date", "agreeAccuracy", "idLocation", "address", "dob"]);
+	// todo use new storage api
+
 	const now = new Date();
 	const questions = Array.from(document.body.querySelectorAll<HTMLSpanElement>("span.surveyquestion"));
 	const questionCells = Array.from(document.body.querySelectorAll<HTMLTableCellElement>("th.surveyquestioncell"));
@@ -135,7 +137,7 @@ async function autofill() {
 	}
 
 	// Copy ID location to clipboard when upload ID button clicked
-	const idLocation = await get<string>("idLocation");
+	const idLocation = "// todo"; // await get<string>("idLocation");
 
 	if (idLocation) {
 		const idQuestion = questions.find((question) => question.textContent?.trim().startsWith("1,5. "));
@@ -152,7 +154,7 @@ async function autofill() {
 	}
 
 	// Auto-fill postcode with stored information
-	const postcode = await get<string>("postcode");
+	const postcode = "// todo"; // await get<string>("postcode");
 
 	if (postcode) {
 		const postcodeQuestion = questions.find((question) => question.textContent?.trim().startsWith("4.1. "));
@@ -166,7 +168,7 @@ async function autofill() {
 	}
 
 	// Auto-fill address with stored information
-	const address = await get<string>("address");
+	const address = "// todo"; // await get<string>("address");
 
 	if (address) {
 		const addressQuestion = questions.find((question) => question.textContent?.trim().startsWith("4.1a. "));
@@ -180,7 +182,7 @@ async function autofill() {
 	}
 
 	// Autofill age with stored information
-	const dob = await get<Date>("dob");
+	const dob = new Date(2000, 0, 1); // todo // await get<Date>("dob");
 
 	if (dob) {
 		const ageYearsQuestion = questionCells.find((question) => question.textContent?.trim().startsWith("2.6.1 "));
