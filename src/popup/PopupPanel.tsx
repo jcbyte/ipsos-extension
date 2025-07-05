@@ -2,10 +2,8 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
 import { Switch } from "@/components/ui/switch";
-import { getSetting, setSetting } from "@/util/storage";
-import { useState } from "preact/hooks";
-
-// todo load values on open
+import { getSetting, getSettings, setSetting } from "@/util/storage";
+import { useEffect, useState } from "preact/hooks";
 
 export default function PopupPanel() {
 	const [useDateEnabled, setUseDateEnabled] = useState<boolean>(false);
@@ -19,8 +17,34 @@ export default function PopupPanel() {
 	const [postcode, setPostcode] = useState<string>("");
 	const [address, setAddress] = useState<string>("");
 
-	const [autofillAge, setAutofillAge] = useState<boolean>(false);
+	const [autofillAgeEnabled, setAutofillAgeEnabled] = useState<boolean>(false);
 	const [dob, setDob] = useState<string>();
+
+	useEffect(() => {
+		async function loadSettings() {
+			const settings = await getSettings([
+				"date.enabled",
+				"agreeAccuracy.enabled",
+				"idLocation.enabled",
+				"idLocation.value",
+				"address.enabled",
+				"address.value",
+				"dob.enabled",
+				"dob.value",
+			]);
+
+			setUseDateEnabled(settings["date.enabled"]);
+			setAgreeAccuracyEnabled(settings["agreeAccuracy.enabled"]);
+			setCopyIdEnabled(settings["idLocation.enabled"]);
+			setIdLocation(settings["idLocation.value"]);
+			setAutofillAddressEnabled(settings["address.enabled"]);
+			setPostcode(settings["address.value"].postcode);
+			setAddress(settings["address.value"].address);
+			setAutofillAgeEnabled(settings["dob.enabled"]);
+			setDob(settings["dob.value"]);
+		}
+		loadSettings();
+	}, []);
 
 	async function handleAutofillDateToggle(checked: boolean) {
 		await setSetting("date.enabled", checked);
@@ -74,7 +98,7 @@ export default function PopupPanel() {
 		}
 
 		await setSetting("dob.enabled", checked);
-		setAutofillAge(checked);
+		setAutofillAgeEnabled(checked);
 	}
 	async function handleDobModified(newDob: string) {
 		await setSetting("dob.value", newDob);
@@ -160,9 +184,9 @@ export default function PopupPanel() {
 				<div className="flex flex-col gap-2">
 					<div className="flex items-center justify-between gap-2">
 						<Label htmlFor="dob-toggle">Auto-fill age</Label>
-						<Switch id="dob-toggle" checked={autofillAge} onCheckedChange={handleAutofillAgeToggle} />
+						<Switch id="dob-toggle" checked={autofillAgeEnabled} onCheckedChange={handleAutofillAgeToggle} />
 					</div>
-					{autofillAge && (
+					{autofillAgeEnabled && (
 						<div class="flex flex-col gap-1">
 							<span class="text-muted-foreground text-xs pl-1">Enter date of birth</span>
 							<Input
