@@ -2,8 +2,16 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
 import { Switch } from "@/components/ui/switch";
+import { useEffect, useState } from "preact/hooks";
 
 export default function PopupPanel() {
+	const [calendarOpen, setCalendarOpen] = useState(false);
+	const [dob, setDob] = useState<Date | undefined>(undefined);
+
+	useEffect(() => {
+		console.log(calendarOpen);
+	}, [calendarOpen]);
+
 	return (
 		<div class="min-w-80 p-6 flex flex-col gap-4">
 			<div class="flex flex-col gap-1 items-center">
@@ -47,7 +55,17 @@ export default function PopupPanel() {
 					<Input type="text" id="address-input" placeholder="Enter address line" />
 				</div>
 
-				{/* // todo add dob selector */}
+				{/* Date of birth date picker */}
+				<div className="flex flex-col gap-2">
+					<div className="flex items-center justify-between gap-2">
+						<Label htmlFor="dob-toggle">Auto-fill age</Label>
+						<Switch id="dob-toggle" />
+					</div>
+					<div class="flex flex-col gap-1">
+						<span class="text-zinc-300 text-xs pl-1">Enter date of birth</span>
+						<Input type="date" id="dob-input" placeholder="Enter date of birth" />
+					</div>
+				</div>
 			</div>
 
 			<Separator />
