@@ -1,5 +1,5 @@
+import { getSetting, getSettings } from "@/util/storage";
 import { waitForElement } from "@/util/util";
-import { getSettings } from "./util/storage";
 
 async function awaitForm() {
 	// Wait for the correct form to be shown
@@ -25,6 +25,7 @@ async function awaitForm() {
 async function autofill() {
 	const settings = await getSettings([
 		"date.enabled",
+		"syncDate.enabled",
 		"agreeAccuracy.enabled",
 		"idLocation.enabled",
 		"address.enabled",
@@ -36,51 +37,93 @@ async function autofill() {
 	const questionCells = Array.from(document.body.querySelectorAll<HTMLTableCellElement>("th.surveyquestioncell"));
 
 	// Auto-fill top date and time box with the current time
-	const topYearSelect = document.querySelector<HTMLSelectElement>("#dsYear");
-	const topMonthSelect = document.querySelector<HTMLSelectElement>("#dsMonth");
-	const topDaySelect = document.querySelector<HTMLSelectElement>("#dsDay");
-	const topHourSelect = document.querySelector<HTMLSelectElement>("#tsHoursHEAD_TIME");
-	const topMinuteSelect = document.querySelector<HTMLSelectElement>("#tsMinutesHEAD_TIME");
+	let topYearSelect: HTMLSelectElement | null = null;
+	let topMonthSelect: HTMLSelectElement | null = null;
+	let topDaySelect: HTMLSelectElement | null = null;
+	let topHourSelect: HTMLSelectElement | null = null;
+	let topMinuteSelect: HTMLSelectElement | null = null;
 
-	if (topYearSelect && topMonthSelect && topDaySelect) {
-		topYearSelect.value = now.getFullYear().toString();
-		topMonthSelect.value = now.getMonth().toString();
-		topDaySelect.value = (now.getDate() - 1).toString();
-	} else {
-		console.warn("Ipsos Extension: Could not find top date boxes.");
+	if (settings["date.enabled"] || settings["syncDate.enabled"]) {
+		topYearSelect = document.querySelector<HTMLSelectElement>("#dsYear");
+		topMonthSelect = document.querySelector<HTMLSelectElement>("#dsMonth");
+		topDaySelect = document.querySelector<HTMLSelectElement>("#dsDay");
+		topHourSelect = document.querySelector<HTMLSelectElement>("#tsHoursHEAD_TIME");
+		topMinuteSelect = document.querySelector<HTMLSelectElement>("#tsMinutesHEAD_TIME");
 	}
 
-	if (topHourSelect && topMinuteSelect) {
-		topHourSelect.value = now.getHours().toString();
-		topMinuteSelect.value = now.getMinutes().toString();
-	} else {
-		console.warn("Ipsos Extension: Could not find top time boxes.");
+	if (settings["date.enabled"]) {
+		if (topYearSelect && topMonthSelect && topDaySelect) {
+			topYearSelect.value = now.getFullYear().toString();
+			topMonthSelect.value = now.getMonth().toString();
+			topDaySelect.value = (now.getDate() - 1).toString();
+		} else {
+			console.warn("Ipsos Extension: Could not find top date boxes.");
+		}
+
+		if (topHourSelect && topMinuteSelect) {
+			topHourSelect.value = now.getHours().toString();
+			topMinuteSelect.value = now.getMinutes().toString();
+		} else {
+			console.warn("Ipsos Extension: Could not find top time boxes.");
+		}
 	}
 
 	// Auto-select yes to confirm information entered is accurate
-	const confirmationQuestion = questions.find((question) => question.textContent?.trim().startsWith("1,1. "));
-	const confirmationYesInput = confirmationQuestion?.parentElement?.querySelector<HTMLInputElement>('input[value="1"]');
+	if (settings["agreeAccuracy.enabled"]) {
+		const confirmationQuestion = questions.find((question) => question.textContent?.trim().startsWith("1,1. "));
+		const confirmationYesInput =
+			confirmationQuestion?.parentElement?.querySelector<HTMLInputElement>('input[value="1"]');
 
-	if (confirmationYesInput) {
-		confirmationYesInput.click();
-	} else {
-		console.warn("Ipsos Extension: Could not confirmation yes radio button.");
+		if (confirmationYesInput) {
+			confirmationYesInput.click();
+		} else {
+			console.warn("Ipsos Extension: Could not confirmation yes radio button.");
+		}
 	}
 
-	// Auto-fill main date with current date
-	const dateQuestion = questions.find((question) => question.textContent?.trim().startsWith("1.2. "));
-	const dateInput = dateQuestion?.parentElement?.querySelector("tbody")?.querySelector<HTMLInputElement>("input");
+	// Auto-fill main date and time with current time
+	let dateInput: HTMLInputElement | null = null;
+	let hourSelect: HTMLSelectElement | null = null;
+	let minuteSelect: HTMLSelectElement | null = null;
 
-	if (dateInput) {
-		const day = String(now.getDate()).padStart(2, "0");
-		const month = String(now.getMonth() + 1).padStart(2, "0");
-		const year = now.getFullYear();
-		const formattedDate = `${day}/${month}/${year}`;
+	if (settings["date.enabled"] || settings["syncDate.enabled"]) {
+		const dateQuestion = questions.find((question) => question.textContent?.trim().startsWith("1.2. "));
+		dateInput = dateQuestion?.parentElement?.querySelector("tbody")?.querySelector<HTMLInputElement>("input") ?? null;
 
-		dateInput.value = formattedDate;
+		const timeQuestion = questions.find((question) => question.textContent?.trim().startsWith("1.3. "));
+		const timeSelects = timeQuestion?.parentElement
+			?.querySelector("tbody")
+			?.querySelectorAll<HTMLSelectElement>("select");
 
-		// Sync changes with top date
-		if (topYearSelect && topMonthSelect && topDaySelect) {
+		if (timeSelects && timeSelects.length === 2) {
+			hourSelect = timeSelects[0];
+			minuteSelect = timeSelects[1];
+		}
+	}
+
+	if (settings["date.enabled"]) {
+		if (dateInput) {
+			const day = String(now.getDate()).padStart(2, "0");
+			const month = String(now.getMonth() + 1).padStart(2, "0");
+			const year = now.getFullYear();
+			const formattedDate = `${day}/${month}/${year}`;
+
+			dateInput.value = formattedDate;
+		} else {
+			console.warn("Ipsos Extension: Could not find date input.");
+		}
+
+		if (hourSelect && minuteSelect) {
+			hourSelect.value = now.getHours().toString().padStart(2, "0");
+			minuteSelect.value = now.getMinutes().toString().padStart(2, "0");
+		} else {
+			console.warn("Ipsos Extension: Could not find time inputs.");
+		}
+	}
+
+	// Sync changes with top date and time
+	if (settings["syncDate.enabled"]) {
+		if (dateInput && topYearSelect && topMonthSelect && topDaySelect) {
 			// We have to use a polling method here, as the calender selector updates `dateInput.value` silently
 			let lastDateInputValue = dateInput.value;
 			setInterval(() => {
@@ -106,26 +149,12 @@ async function autofill() {
 			topYearSelect.addEventListener("change", updateDateInput);
 			topMonthSelect.addEventListener("change", updateDateInput);
 			topDaySelect.addEventListener("change", updateDateInput);
+		} else {
+			console.warn("Ipsos Extension: Could not find top date boxes or date input (for syncing).");
 		}
-	} else {
-		console.warn("Ipsos Extension: Could not find date input.");
-	}
-
-	// Auto-fill main time with current time
-	const timeQuestion = questions.find((question) => question.textContent?.trim().startsWith("1.3. "));
-	const timeSelects = timeQuestion?.parentElement
-		?.querySelector("tbody")
-		?.querySelectorAll<HTMLSelectElement>("select");
-
-	if (timeSelects && timeSelects.length === 2) {
-		const hourSelect = timeSelects[0];
-		const minuteSelect = timeSelects[1];
-
-		hourSelect.value = now.getHours().toString().padStart(2, "0");
-		minuteSelect.value = now.getMinutes().toString().padStart(2, "0");
 
 		// Sync changes with top time
-		if (topHourSelect && topMinuteSelect) {
+		if (hourSelect && minuteSelect && topHourSelect && topMinuteSelect) {
 			hourSelect.addEventListener("change", (e) => {
 				const newValue = (e.target as HTMLSelectElement).value;
 				const formattedValue = newValue.replace(/^0+/, "") || "0";
@@ -137,60 +166,66 @@ async function autofill() {
 				const formattedValue = newValue.padStart(2, "0");
 				hourSelect.value = formattedValue;
 			});
+
+			// todo minute select?
+		} else {
+			console.warn("Ipsos Extension: Could not find top time boxes or time inputs (for syncing).");
 		}
-	} else {
-		console.warn("Ipsos Extension: Could not find time inputs.");
 	}
 
 	// Copy ID location to clipboard when upload ID button clicked
-	const idLocation = "// todo"; // await get<string>("idLocation");
+	if (settings["idLocation.enabled"]) {
+		const idLocation = await getSetting("idLocation.value");
 
-	if (idLocation) {
-		const idQuestion = questions.find((question) => question.textContent?.trim().startsWith("1,5. "));
-		const idUploadButton = idQuestion?.closest("td.surveyquestioncell")?.querySelector("#uploadImgBtn");
+		if (idLocation) {
+			const idQuestion = questions.find((question) => question.textContent?.trim().startsWith("1,5. "));
+			const idUploadButton = idQuestion?.closest("td.surveyquestioncell")?.querySelector("#uploadImgBtn");
 
-		if (idUploadButton) {
-			// Copy ID location to clipboard when clicked
-			idUploadButton.addEventListener("click", () => {
-				navigator.clipboard.writeText(idLocation);
-			});
-		} else {
-			console.warn("Ipsos Extension: Could not find ID upload button.");
+			if (idUploadButton) {
+				// Copy ID location to clipboard when clicked
+				idUploadButton.addEventListener("click", () => {
+					navigator.clipboard.writeText(idLocation);
+				});
+			} else {
+				console.warn("Ipsos Extension: Could not find ID upload button.");
+			}
 		}
 	}
 
-	// Auto-fill postcode with stored information
-	const postcode = "// todo"; // await get<string>("postcode");
+	// Auto-fill postcode and address with stored information
+	if (settings["address.enabled"]) {
+		const address = await getSetting("address.value");
 
-	if (postcode) {
 		const postcodeQuestion = questions.find((question) => question.textContent?.trim().startsWith("4.1. "));
 		const postcodeTextarea = postcodeQuestion?.parentElement?.querySelector<HTMLTextAreaElement>("textarea");
 
 		if (postcodeTextarea) {
-			postcodeTextarea.value = postcode;
+			postcodeTextarea.value = address.postcode;
 		} else {
 			console.warn("Ipsos Extension: Could not find postcode text area.");
 		}
-	}
 
-	// Auto-fill address with stored information
-	const address = "// todo"; // await get<string>("address");
-
-	if (address) {
 		const addressQuestion = questions.find((question) => question.textContent?.trim().startsWith("4.1a. "));
 		const addressTextarea = addressQuestion?.parentElement?.querySelector<HTMLTextAreaElement>("textarea");
 
 		if (addressTextarea) {
-			addressTextarea.value = address;
+			addressTextarea.value = address.address;
 		} else {
 			console.warn("Ipsos Extension: Could not find address text area.");
 		}
 	}
 
-	// Autofill age with stored information
-	const dob = new Date(2000, 0, 1); // todo // await get<Date>("dob");
+	console.log("1");
+	console.log("2", await getSetting("dob.value"));
+	console.log("3", settings);
+	console.log("4", new Date(await getSetting("dob.value")));
 
-	if (dob) {
+	// Autofill age with stored information
+	if (settings["dob.enabled"]) {
+		const dob = new Date(await getSetting("dob.value"));
+
+		console.log(dob);
+
 		const ageYearsQuestion = questionCells.find((question) => question.textContent?.trim().startsWith("2.6.1 "));
 		const ageYearsTextarea = ageYearsQuestion?.parentElement?.querySelector<HTMLTextAreaElement>("textarea");
 		const ageMonthsQuestion = questionCells.find((question) => question.textContent?.trim().startsWith("2.6.2 "));
