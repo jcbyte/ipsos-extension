@@ -89,7 +89,7 @@ export default function PopupPanel() {
 		}
 
 		await setSetting("address.enabled", checked);
-		setCopyIdEnabled(checked);
+		setAutofillAddressEnabled(checked);
 	}
 	async function handlePostcodeModified(newPostcode: string) {
 		await setSetting("address.value", { postcode: newPostcode, address });
@@ -115,11 +115,20 @@ export default function PopupPanel() {
 	}
 
 	return (
-		<div class="min-w-80 p-6 flex flex-col gap-4">
+		<div class="min-w-[22rem] p-6 flex flex-col gap-4">
 			<div class="flex flex-col gap-1 items-center">
 				<span class="text-xl font-bold text-center">Ipsos Extension</span>
 				<span class="text-muted-foreground text-sm text-center">
-					Ipsos extension is for automating form filling and streamlining survey processes
+					Ipsos Extension is for automating parts of form filling and streamlining survey processes for&nbsp;
+					<a
+						href="https://uk.ishopforipsos.com/"
+						target="_blank"
+						rel="noopener noreferrer"
+						class="underline underline-offset-1"
+					>
+						ishopforipsos
+					</a>
+					.
 				</span>
 			</div>
 
@@ -134,13 +143,13 @@ export default function PopupPanel() {
 
 				{/* Sync date and time toggle */}
 				<div className="flex items-center justify-between gap-2">
-					<Label htmlFor="sync-date-toggle">Sync Date & Time Boxes</Label>
+					<Label htmlFor="sync-date-toggle">Sync Date & Time Fields</Label>
 					<Switch id="sync-date-toggle" checked={syncDateEnabled} onCheckedChange={handleSyncDateToggle} />
 				</div>
 
 				{/* Auto-confirm accuracy statement toggle */}
 				<div className="flex items-center justify-between gap-2">
-					<Label htmlFor="auto-agree-accuracy-toggle">Auto-agree Accuracy Statement</Label>
+					<Label htmlFor="auto-agree-accuracy-toggle">Auto-agree to Accuracy Statement</Label>
 					<Switch
 						id="auto-agree-accuracy-toggle"
 						checked={agreeAccuracyEnabled}
@@ -151,7 +160,7 @@ export default function PopupPanel() {
 				{/* ID file location input */}
 				<div className="flex flex-col gap-2">
 					<div className="flex items-center justify-between gap-2">
-						<Label htmlFor="id-location-toggle">Copy ID path on upload</Label>
+						<Label htmlFor="id-location-toggle">Copy ID File Path on Upload</Label>
 						<Switch id="id-location-toggle" checked={copyIdEnabled} onCheckedChange={handleCopyIdToggle} />
 					</div>
 					{copyIdEnabled && (
@@ -168,7 +177,7 @@ export default function PopupPanel() {
 				{/* Address input */}
 				<div className="flex flex-col gap-2">
 					<div className="flex items-center justify-between gap-2">
-						<Label htmlFor="address-toggle">Auto-fill address</Label>
+						<Label htmlFor="address-toggle">Auto-fill Address</Label>
 						<Switch
 							id="address-toggle"
 							checked={autofillAddressEnabled}
@@ -198,7 +207,7 @@ export default function PopupPanel() {
 				{/* Date of birth date picker */}
 				<div className="flex flex-col gap-2">
 					<div className="flex items-center justify-between gap-2">
-						<Label htmlFor="dob-toggle">Auto-fill age</Label>
+						<Label htmlFor="dob-toggle">Auto-fill Age</Label>
 						<Switch id="dob-toggle" checked={autofillAgeEnabled} onCheckedChange={handleAutofillAgeToggle} />
 					</div>
 					{autofillAgeEnabled && (
@@ -220,7 +229,7 @@ export default function PopupPanel() {
 
 			<div class="flex flex-col gap-0 items-center">
 				<span class="text-muted-foreground text-sm text-center">Version {__APP_VERSION__}</span>
-				<span class="text-muted-foreground text-sm text-center">Made by Joel</span>
+				<span class="text-muted-foreground text-sm text-center">Made by Joel Cutler</span>
 			</div>
 		</div>
 	);
