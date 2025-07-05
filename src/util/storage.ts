@@ -1,29 +1,37 @@
-type SettingKey = "date" | "agreeAccuracy" | "idLocation" | "address" | "dob";
+type StorageKey =
+	| "date.enabled"
+	| "agreeAccuracy.enabled"
+	| "idLocation.enabled"
+	| "idLocation.value"
+	| "address.enabled"
+	| "address.value"
+	| "dob.enabled"
+	| "dob.value";
 
-type BaseSetting = { enabled: boolean };
-type ValueSetting<T> = BaseSetting & { value: T };
+type ExactStorageMap<T extends Record<StorageKey, any>> = T;
 
-type ExactSettingMap<T extends Record<SettingKey, BaseSetting>> = T;
-
-type SettingValueMap = ExactSettingMap<{
-	date: BaseSetting;
-	agreeAccuracy: BaseSetting;
-	idLocation: ValueSetting<string>;
-	address: ValueSetting<{ postcode: string; address: string }>;
-	dob: ValueSetting<string>;
+type StorageValueMap = ExactStorageMap<{
+	"date.enabled": boolean;
+	"agreeAccuracy.enabled": boolean;
+	"idLocation.enabled": boolean;
+	"idLocation.value": string;
+	"address.enabled": boolean;
+	"address.value": { postcode: string; address: string };
+	"dob.enabled": boolean;
+	"dob.value": string;
 }>;
 
-export async function getSetting<T extends SettingKey>(key: T): Promise<SettingValueMap[T] | undefined> {
+export async function getSetting<T extends StorageKey>(key: T): Promise<StorageValueMap[T] | undefined> {
 	const setting = (await chrome.storage.local.get(key))[key];
 	if (!setting) return undefined;
-	return setting as SettingValueMap[T];
+	return setting as StorageValueMap[T];
 }
 
-export async function getSettings<T extends SettingKey>(keys: T[]): Promise<Partial<Pick<SettingValueMap, T>>> {
+export async function getSettings<T extends StorageKey>(keys: T[]): Promise<Partial<Pick<StorageValueMap, T>>> {
 	const result = await chrome.storage.local.get(keys);
-	return result as Partial<Pick<SettingValueMap, T>>;
+	return result as Partial<Pick<StorageValueMap, T>>;
 }
 
-export async function setSetting<T extends SettingKey>(key: T, value: SettingValueMap[T]): Promise<void> {
+export async function setSetting<T extends StorageKey>(key: T, value: StorageValueMap[T]): Promise<void> {
 	await chrome.storage.local.set({ [key]: value });
 }
