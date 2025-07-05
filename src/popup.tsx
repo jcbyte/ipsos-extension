@@ -1,6 +1,6 @@
 import { render } from "preact";
 import Popup from "./popup/Popup";
 
-import "./style.css";
+import "./popup.css";
 
 render(<Popup />, document.getElementById("app")!);
