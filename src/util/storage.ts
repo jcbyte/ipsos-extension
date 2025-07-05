@@ -21,15 +21,25 @@ type StorageValueMap = ExactStorageMap<{
 	"dob.value": string;
 }>;
 
-export async function getSetting<T extends StorageKey>(key: T): Promise<StorageValueMap[T] | undefined> {
-	const setting = (await chrome.storage.local.get(key))[key];
-	if (!setting) return undefined;
+const defaultValues: StorageValueMap = {
+	"date.enabled": true,
+	"agreeAccuracy.enabled": false,
+	"idLocation.enabled": false,
+	"idLocation.value": "",
+	"address.enabled": false,
+	"address.value": { postcode: "", address: "" },
+	"dob.enabled": false,
+	"dob.value": "",
+};
+
+export async function getSetting<T extends StorageKey>(key: T): Promise<StorageValueMap[T]> {
+	const setting = (await chrome.storage.local.get({ [key]: defaultValues[key] }))[key];
 	return setting as StorageValueMap[T];
 }
 
-export async function getSettings<T extends StorageKey>(keys: T[]): Promise<Partial<Pick<StorageValueMap, T>>> {
-	const result = await chrome.storage.local.get(keys);
-	return result as Partial<Pick<StorageValueMap, T>>;
+export async function getSettings<T extends StorageKey>(keys: T[]): Promise<Pick<StorageValueMap, T>> {
+	const result = await chrome.storage.local.get(Object.fromEntries(keys.map((key) => [key, defaultValues[key]])));
+	return result as Pick<StorageValueMap, T>;
 }
 
 export async function setSetting<T extends StorageKey>(key: T, value: StorageValueMap[T]): Promise<void> {
