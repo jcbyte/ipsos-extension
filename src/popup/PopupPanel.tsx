@@ -5,8 +5,12 @@ import { Switch } from "@/components/ui/switch";
 import { getSetting, getSettings, setSetting } from "@/util/storage";
 import { useEffect, useState } from "preact/hooks";
 
+// todo get version number
+
 export default function PopupPanel() {
 	const [useDateEnabled, setUseDateEnabled] = useState<boolean>(false);
+
+	const [syncDateEnabled, setSyncDateEnabled] = useState<boolean>(false);
 
 	const [agreeAccuracyEnabled, setAgreeAccuracyEnabled] = useState<boolean>(false);
 
@@ -24,6 +28,7 @@ export default function PopupPanel() {
 		async function loadSettings() {
 			const settings = await getSettings([
 				"date.enabled",
+				"syncDate.enabled",
 				"agreeAccuracy.enabled",
 				"idLocation.enabled",
 				"idLocation.value",
@@ -34,6 +39,7 @@ export default function PopupPanel() {
 			]);
 
 			setUseDateEnabled(settings["date.enabled"]);
+			setSyncDateEnabled(settings["syncDate.enabled"]);
 			setAgreeAccuracyEnabled(settings["agreeAccuracy.enabled"]);
 			setCopyIdEnabled(settings["idLocation.enabled"]);
 			setIdLocation(settings["idLocation.value"]);
@@ -49,6 +55,11 @@ export default function PopupPanel() {
 	async function handleAutofillDateToggle(checked: boolean) {
 		await setSetting("date.enabled", checked);
 		setUseDateEnabled(checked);
+	}
+
+	async function handleSyncDateToggle(checked: boolean) {
+		await setSetting("syncDate.enabled", checked);
+		setSyncDateEnabled(checked);
 	}
 
 	async function handleAutoAgreeAccuracyToggle(checked: boolean) {
@@ -121,6 +132,12 @@ export default function PopupPanel() {
 				<div className="flex items-center justify-between gap-2">
 					<Label htmlFor="auto-fill-date-toggle">Auto-fill Date & Time</Label>
 					<Switch id="auto-fill-date-toggle" checked={useDateEnabled} onCheckedChange={handleAutofillDateToggle} />
+				</div>
+
+				{/* Sync date and time toggle */}
+				<div className="flex items-center justify-between gap-2">
+					<Label htmlFor="sync-date-toggle">Sync Date & Time Boxes</Label>
+					<Switch id="sync-date-toggle" checked={syncDateEnabled} onCheckedChange={handleSyncDateToggle} />
 				</div>
 
 				{/* Auto-confirm accuracy statement toggle */}

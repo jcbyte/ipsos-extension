@@ -1,4 +1,5 @@
 import { waitForElement } from "@/util/util";
+import { getSettings } from "./util/storage";
 
 async function awaitForm() {
 	// Wait for the correct form to be shown
@@ -22,8 +23,13 @@ async function awaitForm() {
 }
 
 async function autofill() {
-	// const settings = await getSettings(["date", "agreeAccuracy", "idLocation", "address", "dob"]);
-	// todo use new storage api
+	const settings = await getSettings([
+		"date.enabled",
+		"agreeAccuracy.enabled",
+		"idLocation.enabled",
+		"address.enabled",
+		"dob.enabled",
+	]);
 
 	const now = new Date();
 	const questions = Array.from(document.body.querySelectorAll<HTMLSpanElement>("span.surveyquestion"));

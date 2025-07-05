@@ -1,5 +1,6 @@
 type StorageKey =
 	| "date.enabled"
+	| "syncDate.enabled"
 	| "agreeAccuracy.enabled"
 	| "idLocation.enabled"
 	| "idLocation.value"
@@ -12,6 +13,7 @@ type ExactStorageMap<T extends Record<StorageKey, any>> = T;
 
 type StorageValueMap = ExactStorageMap<{
 	"date.enabled": boolean;
+	"syncDate.enabled": boolean;
 	"agreeAccuracy.enabled": boolean;
 	"idLocation.enabled": boolean;
 	"idLocation.value": string;
@@ -23,6 +25,7 @@ type StorageValueMap = ExactStorageMap<{
 
 const defaultValues: StorageValueMap = {
 	"date.enabled": true,
+	"syncDate.enabled": true,
 	"agreeAccuracy.enabled": false,
 	"idLocation.enabled": false,
 	"idLocation.value": "",
