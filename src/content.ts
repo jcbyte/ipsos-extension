@@ -23,8 +23,6 @@ async function awaitForm() {
 	});
 }
 
-// todo do not set if there is already a value there
-
 async function autofill() {
 	const settings = await getSettings([
 		"date.enabled",
@@ -39,9 +37,11 @@ async function autofill() {
 	const questions = Array.from(document.body.querySelectorAll<HTMLSpanElement>("span.surveyquestion"));
 	const questionCells = Array.from(document.body.querySelectorAll<HTMLTableCellElement>("th.surveyquestioncell"));
 
+	/** Whether we are updating the time objects, so they shouldn't update as this would create a feedback loop. */
 	let isTimeSyncing = false;
 
 	// Auto-fill top date and time box with the current time
+	// todo do not set if there is already a value there
 	let topYearSelect: HTMLSelectElement | null = null;
 	let topMonthSelect: HTMLSelectElement | null = null;
 	let topDaySelect: HTMLSelectElement | null = null;
@@ -80,18 +80,26 @@ async function autofill() {
 
 	// Auto-select yes to confirm information entered is accurate
 	if (settings["agreeAccuracy.enabled"]) {
+		// Get "yes" and "no" DOM buttons
 		const confirmationQuestion = questions.find((question) => question.textContent?.trim().startsWith("1,1. "));
 		const confirmationYesInput =
 			confirmationQuestion?.parentElement?.querySelector<HTMLInputElement>('input[value="1"]');
+		const confirmationNoInput =
+			confirmationQuestion?.parentElement?.querySelector<HTMLInputElement>('input[value="2"]');
 
-		if (confirmationYesInput) {
-			confirmationYesInput.click();
-		} else {
-			console.warn("Ipsos Extension: Could not confirmation yes radio button.");
+		if (confirmationYesInput && confirmationNoInput) {
+			// Only select if nothing has been previously selected
+			if (!confirmationYesInput.checked && !confirmationNoInput.checked) {
+				// Select yes
+				confirmationYesInput.click();
+			} else {
+				console.warn("Ipsos Extension: Could not confirmation yes radio button.");
+			}
 		}
 	}
 
 	// Auto-fill main date and time with current time
+	// todo do not set if there is already a value there
 	let dateInput: HTMLInputElement | null = null;
 	let hourSelect: HTMLSelectElement | null = null;
 	let minuteSelect: HTMLSelectElement | null = null;
@@ -247,22 +255,27 @@ async function autofill() {
 
 	// Auto-fill postcode and address with stored information
 	if (settings["address.enabled"]) {
+		// Get the saved address value
 		const address = await getSetting("address.value");
 
+		// Get the DOM postcode input field
 		const postcodeQuestion = questions.find((question) => question.textContent?.trim().startsWith("4.1. "));
 		const postcodeTextarea = postcodeQuestion?.parentElement?.querySelector<HTMLTextAreaElement>("textarea");
 
 		if (postcodeTextarea) {
-			postcodeTextarea.value = address.postcode;
+			// Only set if nothing has been previously entered
+			if (!postcodeTextarea.value) postcodeTextarea.value = address.postcode;
 		} else {
 			console.warn("Ipsos Extension: Could not find postcode text area.");
 		}
 
+		// Get the DOM address line input field
 		const addressQuestion = questions.find((question) => question.textContent?.trim().startsWith("4.1a. "));
 		const addressTextarea = addressQuestion?.parentElement?.querySelector<HTMLTextAreaElement>("textarea");
 
 		if (addressTextarea) {
-			addressTextarea.value = address.address;
+			// Only set if nothing has been previously entered
+			if (!addressTextarea.value) addressTextarea.value = address.address;
 		} else {
 			console.warn("Ipsos Extension: Could not find address text area.");
 		}
@@ -270,19 +283,26 @@ async function autofill() {
 
 	// Autofill age with stored information
 	if (settings["dob.enabled"]) {
+		// Get the saved address value
 		const dob = new Date(await getSetting("dob.value"));
 
+		// Check the date is valid
 		if (!Number.isNaN(dob.getTime())) {
+			// Get the DOM age input fields
 			const ageYearsQuestion = questionCells.find((question) => question.textContent?.trim().startsWith("2.6.1 "));
 			const ageYearsTextarea = ageYearsQuestion?.parentElement?.querySelector<HTMLTextAreaElement>("textarea");
 			const ageMonthsQuestion = questionCells.find((question) => question.textContent?.trim().startsWith("2.6.2 "));
 			const ageMonthsTextarea = ageMonthsQuestion?.parentElement?.querySelector<HTMLTextAreaElement>("textarea");
 
 			if (ageYearsTextarea && ageMonthsTextarea) {
+				// Calculate the difference between now and DOB
 				const age = new DateDiff(now, dob);
 
-				ageYearsTextarea.value = String(Math.floor(age.years())).padStart(2, "0");
-				ageMonthsTextarea.value = String(Math.floor(age.months()) % 12).padStart(2, "0");
+				if (!ageYearsTextarea.value && !ageMonthsTextarea.value) {
+					// Only set if nothing has been previously entered
+					ageYearsTextarea.value = String(Math.floor(age.years())).padStart(2, "0");
+					ageMonthsTextarea.value = String(Math.floor(age.months()) % 12).padStart(2, "0");
+				}
 			} else {
 				console.warn("Ipsos Extension: Could not find year and/or month age text area.");
 			}
