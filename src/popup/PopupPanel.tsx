@@ -7,6 +7,8 @@ import { TriangleAlert } from "lucide-react";
 import { useEffect, useState } from "preact/hooks";
 
 export default function PopupPanel() {
+	// This form is made of controlled input elements which update storage on change
+
 	const [useDateEnabled, setUseDateEnabled] = useState<boolean>(false);
 
 	const [syncDateEnabled, setSyncDateEnabled] = useState<boolean>(false);
@@ -24,6 +26,7 @@ export default function PopupPanel() {
 	const [dob, setDob] = useState<string>();
 
 	useEffect(() => {
+		// Initially load settings
 		async function loadSettings() {
 			const settings = await getSettings([
 				"date.enabled",

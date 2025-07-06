@@ -49,6 +49,7 @@ async function autofill() {
 	let topMinuteSelect: HTMLSelectElement | null = null;
 
 	if (settings["date.enabled"] || settings["syncDate.enabled"]) {
+		// Get top date and time DOM selects
 		topYearSelect = document.querySelector<HTMLSelectElement>("#dsYear");
 		topMonthSelect = document.querySelector<HTMLSelectElement>("#dsMonth");
 		topDaySelect = document.querySelector<HTMLSelectElement>("#dsDay");
@@ -58,6 +59,7 @@ async function autofill() {
 
 	if (settings["date.enabled"]) {
 		if (topYearSelect && topMonthSelect && topDaySelect) {
+			// Set to current date and dispatch change events for the form
 			topYearSelect.value = now.getFullYear().toString();
 			topYearSelect.dispatchEvent(new Event("change"));
 			topMonthSelect.value = now.getMonth().toString();
@@ -69,6 +71,7 @@ async function autofill() {
 		}
 
 		if (topHourSelect && topMinuteSelect) {
+			// Set to current time and dispatch change events for the form
 			topHourSelect.value = now.getHours().toString();
 			topHourSelect.dispatchEvent(new Event("change"));
 			topMinuteSelect.value = now.getMinutes().toString();
@@ -105,9 +108,11 @@ async function autofill() {
 	let minuteSelect: HTMLSelectElement | null = null;
 
 	if (settings["date.enabled"] || settings["syncDate.enabled"]) {
+		// Get main date DOM input
 		const dateQuestion = questions.find((question) => question.textContent?.trim().startsWith("1.2. "));
 		dateInput = dateQuestion?.parentElement?.querySelector("tbody")?.querySelector<HTMLInputElement>("input") ?? null;
 
+		// Get main time DOM input
 		const timeQuestion = questions.find((question) => question.textContent?.trim().startsWith("1.3. "));
 		const timeSelects = timeQuestion?.parentElement
 			?.querySelector("tbody")
@@ -126,6 +131,7 @@ async function autofill() {
 			const year = now.getFullYear();
 			const formattedDate = `${day}/${month}/${year}`;
 
+			// Set to current date and dispatch change events for the form
 			// todo this doesn't seem to work
 			dateInput.value = formattedDate;
 			dateInput.dispatchEvent(new Event("change"));
@@ -134,6 +140,7 @@ async function autofill() {
 		}
 
 		if (hourSelect && minuteSelect) {
+			// Set to current time and dispatch change events for the form
 			hourSelect.value = now.getHours().toString().padStart(2, "0");
 			hourSelect.dispatchEvent(new Event("change"));
 			minuteSelect.value = now.getMinutes().toString().padStart(2, "0");
@@ -151,32 +158,48 @@ async function autofill() {
 			setInterval(() => {
 				if (dateInput.value !== lastDateInputValue) {
 					lastDateInputValue = dateInput.value;
+					// ? This wont work with polling
+					// // Do not run if this is being updated from somewhere else
+					// if (isTimeSyncing) return;
+
+					// Extract date
 					const [day, month, year] = dateInput.value.split("/");
 
+					// Set flag to true to avoid looping
 					isTimeSyncing = true;
+					// Set top selects to changed date and dispatch change events for the form
 					topYearSelect.value = year;
 					topYearSelect.dispatchEvent(new Event("change"));
 					topMonthSelect.value = String(Number(month) - 1);
 					topMonthSelect.dispatchEvent(new Event("change"));
 					topDaySelect.value = String(Number(day) - 1);
 					topDaySelect.dispatchEvent(new Event("change"));
+					// Reset flag
 					isTimeSyncing = false;
 				}
 			}, 100);
 
 			const updateDateInput = () => {
+				// Do not run if this is being updated from somewhere else
+				if (isTimeSyncing) return;
+
+				// Extract date
 				const day = String(Number(topDaySelect.value) + 1).padStart(2, "0");
 				const month = String(Number(topMonthSelect.value) + 1).padStart(2, "0");
 				const year = topYearSelect.value;
 				const formattedDate = `${day}/${month}/${year}`;
 
 				// todo this doesn't seem to work?
-				dateInput.value = formattedDate;
+				// Set flag to true to avoid looping
 				isTimeSyncing = true;
+				// Set main date to changed date and dispatch change events for the form
+				dateInput.value = formattedDate;
 				dateInput.dispatchEvent(new Event("change"));
+				// Reset flag
 				isTimeSyncing = false;
 			};
 
+			// Add event listeners when any of the top date selects change to update the main date
 			topYearSelect.addEventListener("change", updateDateInput);
 			topMonthSelect.addEventListener("change", updateDateInput);
 			topDaySelect.addEventListener("change", updateDateInput);
@@ -186,47 +209,75 @@ async function autofill() {
 
 		// Sync changes with top time
 		if (hourSelect && minuteSelect && topHourSelect && topMinuteSelect) {
+			// Add event listeners when the main hour select changes to update the top hour
 			hourSelect.addEventListener("change", (e) => {
+				// Do not run if this is being updated from somewhere else
 				if (isTimeSyncing) return;
 
+				// Format hour
 				const newValue = (e.target as HTMLSelectElement).value;
 				const formattedValue = newValue.replace(/^0+/, "") || "0";
+
+				// Set flag to true to avoid looping
+				isTimeSyncing = true;
+				// Set top hour to changed hour and dispatch change events for the form
 				topHourSelect.value = formattedValue;
-				isTimeSyncing = true;
 				topHourSelect.dispatchEvent(new Event("change"));
+				// Reset flag
 				isTimeSyncing = false;
 			});
 
+			// Add event listeners when the top hour select changes to update the main hour
 			topHourSelect.addEventListener("change", (e) => {
+				// Do not run if this is being updated from somewhere else
 				if (isTimeSyncing) return;
 
+				// Format hour
 				const newValue = (e.target as HTMLSelectElement).value;
 				const formattedValue = newValue.padStart(2, "0");
-				hourSelect.value = formattedValue;
+
+				// Set flag to true to avoid looping
 				isTimeSyncing = true;
+				// Set main hour to changed hour and dispatch change events for the form
+				hourSelect.value = formattedValue;
 				hourSelect.dispatchEvent(new Event("change"));
+				// Reset flag
 				isTimeSyncing = false;
 			});
 
+			// Add event listeners when the main minute select changes to update the top minute
 			minuteSelect.addEventListener("change", (e) => {
+				// Do not run if this is being updated from somewhere else
 				if (isTimeSyncing) return;
 
+				// Format minute
 				const newValue = (e.target as HTMLSelectElement).value;
 				const formattedValue = newValue.replace(/^0+/, "") || "0";
-				topMinuteSelect.value = formattedValue;
+
+				// Set flag to true to avoid looping
 				isTimeSyncing = true;
+				// Set top minute to changed minute and dispatch change events for the form
+				topMinuteSelect.value = formattedValue;
 				topMinuteSelect.dispatchEvent(new Event("change"));
+				// Reset flag
 				isTimeSyncing = false;
 			});
 
+			// Add event listeners when the top minute select changes to update the main minute
 			topMinuteSelect.addEventListener("change", (e) => {
+				// Do not run if this is being updated from somewhere else
 				if (isTimeSyncing) return;
 
+				// Format minute
 				const newValue = (e.target as HTMLSelectElement).value;
 				const formattedValue = newValue.padStart(2, "0");
-				minuteSelect.value = formattedValue;
+
+				// Set flag to true to avoid looping
 				isTimeSyncing = true;
+				// Set main minute to changed minute and dispatch change events for the form
+				minuteSelect.value = formattedValue;
 				minuteSelect.dispatchEvent(new Event("change"));
+				// Reset flag
 				isTimeSyncing = false;
 			});
 		} else {
@@ -236,9 +287,12 @@ async function autofill() {
 
 	// Copy ID location to clipboard when upload ID button clicked
 	if (settings["idLocation.enabled"]) {
+		// Get the saved id location
 		const idLocation = await getSetting("idLocation.value");
 
+		// Only copy if the setting has been set
 		if (idLocation) {
+			// Get the DOM postcode input field
 			const idQuestion = questions.find((question) => question.textContent?.trim().startsWith("1,5. "));
 			const idUploadButton = idQuestion?.closest("td.surveyquestioncell")?.querySelector("#uploadImgBtn");
 
