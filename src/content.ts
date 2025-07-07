@@ -41,7 +41,6 @@ async function autofill() {
 	let isTimeSyncing = false;
 
 	// Auto-fill top date and time box with the current time
-	// todo do not set if there is already a value there
 	let topYearSelect: HTMLSelectElement | null = null;
 	let topMonthSelect: HTMLSelectElement | null = null;
 	let topDaySelect: HTMLSelectElement | null = null;
@@ -59,23 +58,33 @@ async function autofill() {
 
 	if (settings["date.enabled"]) {
 		if (topYearSelect && topMonthSelect && topDaySelect) {
-			// Set to current date and dispatch change events for the form
-			topYearSelect.value = now.getFullYear().toString();
-			topYearSelect.dispatchEvent(new Event("change"));
-			topMonthSelect.value = now.getMonth().toString();
-			topMonthSelect.dispatchEvent(new Event("change"));
-			topDaySelect.value = (now.getDate() - 1).toString();
-			topDaySelect.dispatchEvent(new Event("change"));
+			// Only set if nothing has been previously selected
+			if (
+				topYearSelect.value === now.getFullYear().toString() &&
+				topMonthSelect.value === "Month" &&
+				topDaySelect.value === "Day"
+			) {
+				// Set to current date and dispatch change events for the form
+				topYearSelect.value = now.getFullYear().toString();
+				topYearSelect.dispatchEvent(new Event("change"));
+				topMonthSelect.value = now.getMonth().toString();
+				topMonthSelect.dispatchEvent(new Event("change"));
+				topDaySelect.value = (now.getDate() - 1).toString();
+				topDaySelect.dispatchEvent(new Event("change"));
+			}
 		} else {
 			console.warn("Ipsos Extension: Could not find top date boxes.");
 		}
 
 		if (topHourSelect && topMinuteSelect) {
-			// Set to current time and dispatch change events for the form
-			topHourSelect.value = now.getHours().toString();
-			topHourSelect.dispatchEvent(new Event("change"));
-			topMinuteSelect.value = now.getMinutes().toString();
-			topMinuteSelect.dispatchEvent(new Event("change"));
+			// Only set if nothing has been previously selected
+			if (!topHourSelect.value && !topMinuteSelect.value) {
+				// Set to current time and dispatch change events for the form
+				topHourSelect.value = now.getHours().toString();
+				topHourSelect.dispatchEvent(new Event("change"));
+				topMinuteSelect.value = now.getMinutes().toString();
+				topMinuteSelect.dispatchEvent(new Event("change"));
+			}
 		} else {
 			console.warn("Ipsos Extension: Could not find top time boxes.");
 		}
@@ -96,13 +105,12 @@ async function autofill() {
 				// Select yes
 				confirmationYesInput.click();
 			} else {
-				console.warn("Ipsos Extension: Could not confirmation yes radio button.");
+				console.warn("Ipsos Extension: Could not find accuracy statement radio buttons.");
 			}
 		}
 	}
 
 	// Auto-fill main date and time with current time
-	// todo do not set if there is already a value there
 	let dateInput: HTMLInputElement | null = null;
 	let hourSelect: HTMLSelectElement | null = null;
 	let minuteSelect: HTMLSelectElement | null = null;
@@ -131,20 +139,26 @@ async function autofill() {
 			const year = now.getFullYear();
 			const formattedDate = `${day}/${month}/${year}`;
 
-			// Set to current date and dispatch change events for the form
-			// todo this doesn't seem to work
-			dateInput.value = formattedDate;
-			dateInput.dispatchEvent(new Event("change"));
+			// Only set if nothing has been previously entered
+			if (dateInput.value === "DD/MM/YYYY") {
+				// Set to current date and dispatch change events for the form
+				// todo this doesn't seem to work
+				dateInput.value = formattedDate;
+				dateInput.dispatchEvent(new Event("change"));
+			}
 		} else {
 			console.warn("Ipsos Extension: Could not find date input.");
 		}
 
 		if (hourSelect && minuteSelect) {
-			// Set to current time and dispatch change events for the form
-			hourSelect.value = now.getHours().toString().padStart(2, "0");
-			hourSelect.dispatchEvent(new Event("change"));
-			minuteSelect.value = now.getMinutes().toString().padStart(2, "0");
-			minuteSelect.dispatchEvent(new Event("change"));
+			// Only set if nothing has been previously selected
+			if (hourSelect.value === "HH" && minuteSelect.value === "MM") {
+				// Set to current time and dispatch change events for the form
+				hourSelect.value = now.getHours().toString().padStart(2, "0");
+				hourSelect.dispatchEvent(new Event("change"));
+				minuteSelect.value = now.getMinutes().toString().padStart(2, "0");
+				minuteSelect.dispatchEvent(new Event("change"));
+			}
 		} else {
 			console.warn("Ipsos Extension: Could not find time inputs.");
 		}
