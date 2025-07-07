@@ -23,6 +23,46 @@ async function awaitForm() {
 	});
 }
 
+// todo initially sync dates if there out?
+// todo add warns where his is used
+// todo invalid dates when selecting future breaks??
+function selectCalendarDate(date: Date): boolean {
+	// Get calendar DOM element
+	const calendarPopup = document.querySelector<HTMLDivElement>("#DivCalendar");
+
+	// Get the month and year DOM selects
+	const calendarTopBarSelects = calendarPopup?.querySelector(".topTable")?.querySelectorAll("select");
+	if (calendarTopBarSelects?.length !== 2) {
+		return false;
+	}
+	const monthSelect = calendarTopBarSelects[0];
+	const yearSelect = calendarTopBarSelects[1];
+
+	// Set to wanted month and year and dispatch change events for the form
+	monthSelect.selectedIndex = date.getMonth();
+	monthSelect.dispatchEvent(new Event("change"));
+	yearSelect.value = date.getFullYear().toString();
+	yearSelect.dispatchEvent(new Event("change"));
+
+	// Get the day select DOM elements
+	const dateSelectArea = calendarPopup?.querySelector<HTMLTableSectionElement>("tbody[data-datepicker='true']");
+	// Ensure we only pick days from this month
+	const dayButtons = dateSelectArea?.querySelectorAll<HTMLTableCellElement>(
+		"td:not(.notCurrentMonthWeekCell):not(.notCurrentMonthWeekEndCell)"
+	);
+	// Ensure we have the expected number of days
+	const expectedDayAmount = new Date(date.getFullYear(), date.getMonth() + 1, 0).getDate();
+	if (dayButtons?.length !== expectedDayAmount) {
+		return false;
+	}
+
+	// Select the wanted day
+	const wantedDayButton = dayButtons[date.getDate() - 1];
+	wantedDayButton.click();
+
+	return true;
+}
+
 async function autofill() {
 	const settings = await getSettings([
 		"date.enabled",
@@ -134,17 +174,11 @@ async function autofill() {
 
 	if (settings["date.enabled"]) {
 		if (dateInput) {
-			const day = String(now.getDate()).padStart(2, "0");
-			const month = String(now.getMonth() + 1).padStart(2, "0");
-			const year = now.getFullYear();
-			const formattedDate = `${day}/${month}/${year}`;
-
 			// Only set if nothing has been previously entered
 			if (dateInput.value === "DD/MM/YYYY") {
-				// Set to current date and dispatch change events for the form
-				// todo this doesn't seem to work
-				dateInput.value = formattedDate;
-				dateInput.dispatchEvent(new Event("change"));
+				// Open the calendar input and select the current date
+				dateInput.dispatchEvent(new Event("focus"));
+				selectCalendarDate(now);
 			}
 		} else {
 			console.warn("Ipsos Extension: Could not find date input.");
@@ -172,7 +206,10 @@ async function autofill() {
 			setInterval(() => {
 				if (dateInput.value !== lastDateInputValue) {
 					lastDateInputValue = dateInput.value;
-					// ? This wont work with polling
+					// ? This wont work with polling as this function runs at any time (and not as it is being changed).
+					// ? This is fine as the top date inputs prevent looping. This means if the top date
+					// ? is set this will update the main box, which this function will then pick up and
+					// ? set the top date boxes again to what the user just set. Then the circle ends there.
 					// // Do not run if this is being updated from somewhere else
 					// if (isTimeSyncing) return;
 
@@ -198,17 +235,17 @@ async function autofill() {
 				if (isTimeSyncing) return;
 
 				// Extract date
-				const day = String(Number(topDaySelect.value) + 1).padStart(2, "0");
-				const month = String(Number(topMonthSelect.value) + 1).padStart(2, "0");
-				const year = topYearSelect.value;
-				const formattedDate = `${day}/${month}/${year}`;
+				const wantedDate = new Date(
+					Number(topYearSelect.value),
+					Number(topMonthSelect.value),
+					Number(topDaySelect.value) + 1
+				);
 
-				// todo this doesn't seem to work?
 				// Set flag to true to avoid looping
 				isTimeSyncing = true;
 				// Set main date to changed date and dispatch change events for the form
-				dateInput.value = formattedDate;
-				dateInput.dispatchEvent(new Event("change"));
+				dateInput.dispatchEvent(new Event("focus"));
+				selectCalendarDate(wantedDate);
 				// Reset flag
 				isTimeSyncing = false;
 			};
