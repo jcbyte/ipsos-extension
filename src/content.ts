@@ -23,7 +23,6 @@ async function awaitForm() {
 	});
 }
 
-// todo initially sync dates if there out?
 function selectCalendarDate(date: Date): boolean {
 	// Get calendar DOM element
 	const calendarPopup = document.querySelector<HTMLDivElement>("#DivCalendar");
@@ -202,7 +201,8 @@ async function autofill() {
 	if (settings["syncDate.enabled"]) {
 		if (dateInput && topYearSelect && topMonthSelect && topDaySelect) {
 			// We have to use a polling method here, as the calender selector updates `dateInput.value` silently
-			let lastDateInputValue = dateInput.value;
+			// By initially setting to this then the function will always run on start (if the main date is set) therefore initially syncing the times.
+			let lastDateInputValue = "DD/MM/YYYY"; // dateInput.value
 			setInterval(() => {
 				if (dateInput.value !== lastDateInputValue) {
 					lastDateInputValue = dateInput.value;
@@ -336,6 +336,10 @@ async function autofill() {
 				// Reset flag
 				isTimeSyncing = false;
 			});
+
+			// Initially sync the time from the main box
+			hourSelect.dispatchEvent(new Event("change"));
+			minuteSelect.dispatchEvent(new Event("change"));
 		} else {
 			console.warn("Ipsos Extension: Could not find top time boxes or time inputs (for syncing).");
 		}
