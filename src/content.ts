@@ -24,7 +24,6 @@ async function awaitForm() {
 }
 
 // todo initially sync dates if there out?
-// todo add warns where his is used
 // todo invalid dates when selecting future breaks??
 function selectCalendarDate(date: Date): boolean {
 	// Get calendar DOM element
@@ -178,7 +177,9 @@ async function autofill() {
 			if (dateInput.value === "DD/MM/YYYY") {
 				// Open the calendar input and select the current date
 				dateInput.dispatchEvent(new Event("focus"));
-				selectCalendarDate(now);
+				if (!selectCalendarDate(now)) {
+					console.warn("Ipsos Extension: Could not find popup calendar elements.");
+				}
 			}
 		} else {
 			console.warn("Ipsos Extension: Could not find date input.");
@@ -245,7 +246,9 @@ async function autofill() {
 				isTimeSyncing = true;
 				// Set main date to changed date and dispatch change events for the form
 				dateInput.dispatchEvent(new Event("focus"));
-				selectCalendarDate(wantedDate);
+				if (!selectCalendarDate(wantedDate)) {
+					console.warn("Ipsos Extension: Could not find popup calendar elements.");
+				}
 				// Reset flag
 				isTimeSyncing = false;
 			};
