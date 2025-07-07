@@ -1,12 +1,22 @@
 # <img src="icon.png" width="40"> &nbsp; Ipsos Extension
 
-Ipsos Extension is for automating parts of form filling and streamlining survey processes for [ishopforipsos](https://uk.ishopforipsos.com/).
+Ipsos Extension provides quality of life features and automates parts of form filling for [ishopforipsos](https://uk.ishopforipsos.com/).
 
-<img src="demo.png" alt="Description" width="300" />
+<img src="demo.png" alt="Description" width="800" />
 
-Currently supported Forms:
+## Features:
+
+- Autofill Current Date & Time
+- Sync Date & Time Fields Across the Form
+- Auto-Agree to Accuracy Statement
+- Copy ID File Path Before You Select It
+- Autofill Postcode & Address
+- Calculate & Autofill Age Fields
+
+## Currently supported Forms:
 
 - Retail Home Delivery
+- _More form types to be supported in future._
 
 <!-- ## Production Build -->
 

@@ -141,7 +141,7 @@ export default function PopupPanel() {
 			<div className="flex flex-col gap-4">
 				{/* Auto-fill date and time toggle */}
 				<div className="flex items-center justify-between gap-2">
-					<Label htmlFor="auto-fill-date-toggle">Auto-fill Date & Time</Label>
+					<Label htmlFor="auto-fill-date-toggle">Auto-fill Current Date & Time</Label>
 					<Switch id="auto-fill-date-toggle" checked={useDateEnabled} onCheckedChange={handleAutofillDateToggle} />
 				</div>
 

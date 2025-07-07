@@ -1,7 +1,8 @@
 {
 	"manifest_version": 3,
 	"name": "Ipsos Extension",
-	"version": "1.0",
+	"description": "Ipsos Extension provides quality of life features and automates parts of form filling for ishopforipsos.",
+	"version": "1.0.0",
 	"action": {
 		"default_icon": {
 			"16": "icons/icon16.png",
