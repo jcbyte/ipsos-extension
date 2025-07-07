@@ -141,9 +141,9 @@ async function autofill() {
 			if (!confirmationYesInput.checked && !confirmationNoInput.checked) {
 				// Select yes
 				confirmationYesInput.click();
-			} else {
-				console.warn("Ipsos Extension: Could not find accuracy statement radio buttons.");
 			}
+		} else {
+			console.warn("Ipsos Extension: Could not find accuracy statement radio buttons.");
 		}
 	}
 
