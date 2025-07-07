@@ -24,7 +24,6 @@ async function awaitForm() {
 }
 
 // todo initially sync dates if there out?
-// todo invalid dates when selecting future breaks??
 function selectCalendarDate(date: Date): boolean {
 	// Get calendar DOM element
 	const calendarPopup = document.querySelector<HTMLDivElement>("#DivCalendar");
@@ -241,6 +240,9 @@ async function autofill() {
 					Number(topMonthSelect.value),
 					Number(topDaySelect.value) + 1
 				);
+
+				// Do not set if it is invalid
+				if (Number.isNaN(wantedDate.getTime())) return;
 
 				// Set flag to true to avoid looping
 				isTimeSyncing = true;
