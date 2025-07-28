@@ -4,6 +4,10 @@ Ipsos Extension provides quality of life features and automates parts of form fi
 
 <img src="demo.png" alt="Description" width="800" />
 
+## Production Build
+
+[Ipsos Extension](https://chromewebstore.google.com/detail/ipsos-extension/omhgemgeompemoldfbimbdikkljejdjl) on the Chrome Web Store
+
 ## Features:
 
 - Autofill Current Date & Time
@@ -17,8 +21,6 @@ Ipsos Extension provides quality of life features and automates parts of form fi
 
 - Retail Home Delivery
 - _More form types to be supported in future._
-
-<!-- ## Production Build -->
 
 ## Run Locally
 
