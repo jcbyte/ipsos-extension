@@ -7,7 +7,7 @@ async function awaitForm() {
 	await waitForElement(() => {
 		const title = document.body.querySelector("h1.surveytitle");
 
-		if (title?.textContent?.startsWith("Retail Home Delivery")) {
+		if (title?.textContent?.startsWith("AMAZON Retail Home Delivery")) {
 			return title;
 		}
 
@@ -45,7 +45,7 @@ function selectCalendarDate(date: Date): boolean {
 	const dateSelectArea = calendarPopup?.querySelector<HTMLTableSectionElement>("tbody[data-datepicker='true']");
 	// Ensure we only pick days from this month
 	const dayButtons = dateSelectArea?.querySelectorAll<HTMLTableCellElement>(
-		"td:not(.notCurrentMonthWeekCell):not(.notCurrentMonthWeekEndCell)"
+		"td:not(.notCurrentMonthWeekCell):not(.notCurrentMonthWeekEndCell)",
 	);
 	// Ensure we have the expected number of days
 	const expectedDayAmount = new Date(date.getFullYear(), date.getMonth() + 1, 0).getDate();
@@ -238,7 +238,7 @@ async function autofill() {
 				const wantedDate = new Date(
 					Number(topYearSelect.value),
 					Number(topMonthSelect.value),
-					Number(topDaySelect.value) + 1
+					Number(topDaySelect.value) + 1,
 				);
 
 				// Do not set if it is invalid
