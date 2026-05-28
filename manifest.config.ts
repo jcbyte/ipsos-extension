@@ -1,11 +1,12 @@
 import { defineManifest } from "@crxjs/vite-plugin";
+import pkg from "./package.json";
 
 export default defineManifest({
 	manifest_version: 3,
 	name: "Ipsos Extension",
 	description:
 		"Ipsos Extension provides quality of life features and automates parts of form filling for ishopforipsos.",
-	version: "1.0.0",
+	version: pkg.version,
 	action: {
 		default_icon: {
 			16: "icons/icon16.png",
