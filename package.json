@@ -3,8 +3,8 @@
 	"version": "1.0.0",
 	"description": "",
 	"scripts": {
-		"dev": "concurrently \"vite build --mode content --watch\" \"vite build --mode popup --watch\"",
-		"build": "concurrently \"vite build --mode content\" \"vite build --mode popup\""
+		"dev": "vite",
+		"build": "vite build"
 	},
 	"repository": {
 		"type": "git",
@@ -19,15 +19,15 @@
 	},
 	"homepage": "https://github.com/jcbyte/ipsos-extension#readme",
 	"devDependencies": {
+		"@crxjs/vite-plugin": "^2.4.0",
 		"@preact/preset-vite": "2.10.2",
 		"@tailwindcss/vite": "4.1.11",
 		"@types/chrome": "^0.0.329",
 		"@types/node": "24.0.10",
-		"concurrently": "9.2.0",
 		"tailwindcss": "4.1.11",
 		"tw-animate-css": "1.3.5",
 		"typescript": "5.8.3",
-		"vite": "7.0.2"
+		"vite": "^7.0.2"
 	},
 	"dependencies": {
 		"@radix-ui/react-label": "2.1.7",

@@ -1,10 +1,13 @@
+import { crx } from "@crxjs/vite-plugin";
 import preact from "@preact/preset-vite";
 import tailwindcss from "@tailwindcss/vite";
 import { resolve } from "path";
-import { defineConfig, UserConfig } from "vite";
+import { defineConfig } from "vite";
+import manifest from "./manifest.config";
 import pkg from "./package.json";
 
-const baseConfig: UserConfig = {
+export default defineConfig({
+	plugins: [crx({ manifest }), preact(), tailwindcss()],
 	resolve: {
 		alias: {
 			"@": resolve(__dirname, "src"),
@@ -13,39 +16,9 @@ const baseConfig: UserConfig = {
 	define: {
 		__APP_VERSION__: JSON.stringify(pkg.version),
 	},
-};
-
-export default defineConfig(({ mode }) => ({
-	...baseConfig,
-	...(mode === "content"
-		? {
-				// Content script build - IIFE format
-				build: {
-					outDir: "dist/content",
-					copyPublicDir: false, // As this would place it within dist/content
-					rollupOptions: {
-						input: "src/content.ts",
-						output: {
-							entryFileNames: "[name].js",
-							format: "iife", // For injected content script
-						},
-					},
-					emptyOutDir: false,
-				},
-		  }
-		: {
-				// Popup build - ES module format
-				build: {
-					outDir: "dist",
-					rollupOptions: {
-						input: "popup.html",
-						output: {
-							entryFileNames: "[name].js",
-							format: "es",
-						},
-					},
-					emptyOutDir: false,
-				},
-				plugins: [preact(), tailwindcss()],
-		  }),
-}));
+	server: {
+		cors: {
+			origin: [/chrome-extension:\/\//],
+		},
+	},
+});
