@@ -1,5 +1,5 @@
 import { render } from "preact";
-import Popup from "./popup/Popup";
+import Popup from "./Popup";
 
 import "./popup.css";
 

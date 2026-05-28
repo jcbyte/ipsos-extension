@@ -12,18 +12,18 @@ export default defineManifest({
 			48: "icons/icon48.png",
 			128: "icons/icon128.png",
 		},
-		default_popup: "popup.html",
+		default_popup: "src/popup/popup.html",
 	},
 	content_scripts: [
 		{
 			matches: ["https://uk.ishopforipsos.com/*"],
-			js: ["src/content.ts"],
+			js: ["src/content/content.ts"],
 			run_at: "document_idle",
 			all_frames: true,
 		},
 		// {
 		// 	matches: ["https://Media08.research-cloud.com/Upload/*"],
-		// 	js: ["content/content-upload.js"],
+		// 	js: ["src/content/content-upload.ts"],
 		// 	run_at: "document_idle",
 		// 	all_frames: true,
 		// },
