@@ -1,0 +1,30 @@
+.jcbyte-custom-btn {
+	color: #0369a1;
+	background-color: #c0ddf0;
+	font-weight: 500;
+	border: none;
+	border-radius: 8px;
+	cursor: pointer;
+
+	height: 40px;
+	margin: 0px 0px 8px 8px;
+	/* padding: 6px 10px; */
+	padding: 0 12px;
+	vertical-align: middle;
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+
+	transition: background-color 0.2s ease;
+}
+
+.jcbyte-custom-btn img {
+	margin-right: 6px;
+	vertical-align: middle;
+	height: 24px;
+	width: 24px;
+}
+
+.jcbyte-custom-btn:hover {
+	background-color: #94c5e5;
+}

@@ -1,8 +1,9 @@
 import { getSetting, getSettings } from "@/util/storage";
 import { waitForElement } from "@/util/util";
 import DateDiff from "date-diff";
-// import extIcon16 from "../../public/icons/icon16.png";
-// import { markUploadType } from "../util/mark-upload";
+import extIconSrc from "../../public/icons/icon48.png?url";
+import { markUploadType } from "../util/mark-upload";
+import "./content.css";
 
 async function awaitForm() {
 	// Wait for the correct form to be shown
@@ -360,36 +361,35 @@ async function autofill() {
 
 			if (idUploadButton) {
 				// Copy ID location to clipboard when clicked
+				// todo soon obsolete
 				idUploadButton.addEventListener("click", () => {
 					navigator.clipboard.writeText(idLocation);
 				});
 
-				// todo Add "Create ID Button, to automatically upload"
-				// const newButton = document.createElement("button");
-				// newButton.innerHTML = `
-				// <img src="public/icons/icon16.png" alt="Ipsos Extension: Upload ID">
-				// <span>Upload ID</span>
-				// `;
-				// newButton.className =
-				// 	"inline-flex items-center gap-2 px-4 py-3 bg-gray-50 border border-gray-300 rounded text-[#2b6cb0] hover:bg-gray-100 transition duration-150 ease-in-out font-medium";
-				// newButton.type = "button";
+				// Create an automatic upload button next to the regular upload button
+				const uploadIdButton = document.createElement("button");
+				uploadIdButton.className = "jcbyte-custom-btn";
+				uploadIdButton.type = "button";
 
-				// const btnIcon = document.createElement("img");
-				// btnIcon.src = extIcon16;
-				// btnIcon.alt = "Ipsos Extension: Upload ID";
-				// btnIcon.className = "w-4 h-4";
+				const buttonIcon = document.createElement("img");
+				buttonIcon.src = extIconSrc;
+				buttonIcon.alt = "Ipsos Extension: Upload ID";
+				buttonIcon.style = "height: 24px; width: 24px";
 
-				// const btnText = document.createElement("span");
-				// btnText.textContent = "Upload ID"; // textContent is 100% safe from XSS
+				const buttonText = document.createElement("span");
+				buttonText.textContent = "   Upload ID";
 
-				// newButton.appendChild(btnIcon);
-				// newButton.appendChild(btnText);
+				uploadIdButton.appendChild(buttonIcon);
+				uploadIdButton.appendChild(buttonText);
 
-				// newButton.addEventListener("click", async () => {
-				// 	await markUploadType("id");
-				// 	idUploadButton.click();
-				// });
-				// idUploadButton.insertAdjacentElement("afterend", newButton);
+				uploadIdButton.addEventListener("click", async () => {
+					// When clicking this custom button, set upload type as
+					// the upload window runs a separate script (separate iframe)
+					await markUploadType("id");
+					// todo idUploadButton.click();
+				});
+				// Place the button directly afterwards
+				idUploadButton.insertAdjacentElement("afterend", uploadIdButton);
 			} else {
 				console.warn("Ipsos Extension: Could not find ID upload button.");
 			}
