@@ -22,12 +22,12 @@ export default defineManifest({
 			run_at: "document_idle",
 			all_frames: true,
 		},
-		// {
-		// 	matches: ["https://Media08.research-cloud.com/Upload/*"],
-		// 	js: ["src/content/content-upload.ts"],
-		// 	run_at: "document_idle",
-		// 	all_frames: true,
-		// },
+		{
+			matches: ["https://media08.research-cloud.com/Upload/*"],
+			js: ["src/content/content-upload.ts"],
+			run_at: "document_idle",
+			all_frames: true,
+		},
 	],
 	permissions: ["storage"],
 });

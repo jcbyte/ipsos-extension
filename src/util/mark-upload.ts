@@ -25,3 +25,19 @@ export async function markUploadType(value: Exclude<UploadType, null>) {
 export async function markUploadComplete() {
 	await chrome.storage.local.set({ [uploadTypeKey]: null });
 }
+
+/**
+ * Provide a callback, executed once when the upload is marked as complete.
+ *
+ * @param cb Callback to run once
+ */
+export function markCompleteCallback(cb: () => void) {
+	function handle_storage_change(changes: { [key: string]: chrome.storage.StorageChange }) {
+		if (changes[uploadTypeKey] && changes[uploadTypeKey].newValue === null) {
+			cb();
+			chrome.storage.onChanged.removeListener(handle_storage_change);
+		}
+	}
+
+	chrome.storage.onChanged.addListener(handle_storage_change);
+}

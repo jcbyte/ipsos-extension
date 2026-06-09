@@ -2,7 +2,7 @@ import { getSetting, getSettings } from "@/util/storage";
 import { waitForElement } from "@/util/util";
 import DateDiff from "date-diff";
 import extIconSrc from "../../public/icons/icon48.png?url";
-import { markUploadType } from "../util/mark-upload";
+import { markCompleteCallback, markUploadType } from "../util/mark-upload";
 import "./content.css";
 
 async function awaitForm() {
@@ -386,7 +386,12 @@ async function autofill() {
 					// When clicking this custom button, set upload type as
 					// the upload window runs a separate script (separate iframe)
 					await markUploadType("id");
-					// todo idUploadButton.click();
+					markCompleteCallback(() => {
+						console.log("Ipsos Extension: Upload marked as complete, closing modal.");
+						const closeBtn = document.querySelector<HTMLElement>(".surveyAttachmentUploadModalPopUpCloseBtn");
+						if (closeBtn) closeBtn.click();
+					});
+					idUploadButton.click();
 				});
 				// Place the button directly afterwards
 				idUploadButton.insertAdjacentElement("afterend", uploadIdButton);

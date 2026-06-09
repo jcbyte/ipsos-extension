@@ -14,23 +14,28 @@ async function checkUpload() {
 
 	console.log(`Ipsos Extension: Upload form found, whilst requesting '${uploadType}'.`);
 
-	const fileUpload = document.querySelector('input[type="file"]');
+	const fileUpload = document.querySelector<HTMLInputElement>('input[type="file"]');
+	if (fileUpload) {
+		// Convert the stored base64 image, into a blob to create a file object
+		const res = await fetch(EG_B64);
+		const blob = await res.blob();
+		// todo what if not png
+		const file = new File([blob], "uploaded_image.png", { type: "image/png" });
 
-	const res = await fetch(EG_B64);
-	const blob = await res.blob();
+		// Create a data transfer object to upload the "file" to the upload input
+		const dataTransfer = new DataTransfer();
+		dataTransfer.items.add(file);
 
-	const file = new File([blob], "uploaded_image.png", { type: "image/png" });
-	const dataTransfer = new DataTransfer();
-	dataTransfer.items.add(file);
-	fileUpload.files = dataTransfer.files;
-	fileUpload.dispatchEvent(new Event("change", { bubbles: true }));
-	console.log("File successfully injected into sub-iframe!");
+		// Attach the files into the input
+		fileUpload.files = dataTransfer.files;
+		fileUpload.dispatchEvent(new Event("change", { bubbles: true }));
+		// todo wait for this to finish uploading
 
+		console.log("Ipsos Extension: File injected into sub-iframe.");
+	}
+
+	// Mark the upload as complete, which will make the main context press the close button
 	markUploadComplete();
-
-	// todo this close butotn is in the main context, not here
-	// const closeBtn = document.querySelector(".surveyAttachmentUploadModalPopUpCloseBtn");
-	// closeBtn.click();
 }
 
 checkUpload();
