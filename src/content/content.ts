@@ -3,7 +3,6 @@ import { waitForElement } from "@/util/util";
 import DateDiff from "date-diff";
 // import extIcon16 from "../../public/icons/icon16.png";
 // import { markUploadType } from "../util/mark-upload";
-import "./content.css";
 
 async function awaitForm() {
 	// Wait for the correct form to be shown

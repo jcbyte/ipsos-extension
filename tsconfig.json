@@ -1,25 +1,26 @@
 {
   "compilerOptions": {
-    "target": "ESNext",
+    "target": "es2022",
     "lib": [
       "DOM",
-      "ESNext"
+      "DOM.Iterable",
+      "ES2022"
     ],
     "module": "ESNext",
-    "moduleResolution": "Node",
+    "moduleResolution": "bundler",
+    "isolatedModules": true,
+    "noEmit": true,
     "types": [
       "chrome"
     ],
     "strict": true,
     "esModuleInterop": true,
-    "outDir": "dist",
-    "rootDir": "src",
-    "jsx": "react-jsx",
     "skipLibCheck": true,
-    "baseUrl": "./",
+    "jsx": "react-jsx",
+    "jsxImportSource": "preact",
     "paths": {
       "@/*": [
-        "src/*"
+        "./src/*"
       ],
       "react": [
         "./node_modules/preact/compat/"
@@ -36,6 +37,6 @@
     }
   },
   "include": [
-    "src"
+    "src/**/*"
   ]
 }
