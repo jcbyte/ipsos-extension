@@ -71,7 +71,7 @@ async function autofill() {
 		"date.enabled",
 		"syncDate.enabled",
 		"agreeAccuracy.enabled",
-		"idLocation.enabled",
+		"idImage.value",
 		"address.enabled",
 		"dob.enabled",
 	]);
@@ -351,72 +351,60 @@ async function autofill() {
 		}
 	}
 
-	// Copy ID location to clipboard when upload ID button clicked
-	if (settings["idLocation.enabled"]) {
-		// Get the saved id location
-		const idLocation = await getSetting("idLocation.value");
+	// Show an "Upload ID" button when an ID is set
+	if (settings["idImage.value"]) {
+		// Get the DOM ID input field
+		const idQuestion = questions.find((question) => question.textContent?.trim().startsWith("1,5. "));
+		const idQuestionCell = idQuestion?.closest("td.surveyquestioncell");
+		const idUploadButton = idQuestionCell?.querySelector<HTMLElement>("#uploadImgBtn");
+		const idUploadPreview = idQuestionCell?.querySelector<HTMLElement>("div");
 
-		// Only copy if the setting has been set
-		if (idLocation) {
-			// Get the DOM postcode input field
-			const idQuestion = questions.find((question) => question.textContent?.trim().startsWith("1,5. "));
-			const idQuestionCell = idQuestion?.closest("td.surveyquestioncell");
-			const idUploadButton = idQuestionCell?.querySelector<HTMLElement>("#uploadImgBtn");
-			const idUploadPreview = idQuestionCell?.querySelector<HTMLElement>("div");
+		if (idUploadButton && idUploadPreview) {
+			// Create an automatic upload button next to the regular upload button
+			const extIdButton = document.createElement("button");
+			extIdButton.className = "jcbyte-custom-btn";
+			extIdButton.type = "button";
 
-			if (idUploadButton && idUploadPreview) {
-				// Copy ID location to clipboard when clicked
-				// todo soon obsolete
-				idUploadButton.addEventListener("click", () => {
-					navigator.clipboard.writeText(idLocation);
-				});
+			const buttonIcon = document.createElement("img");
+			buttonIcon.src = extIconSrc;
+			buttonIcon.alt = "Ipsos Extension: Upload ID";
+			buttonIcon.style = "height: 24px; width: 24px";
 
-				// Create an automatic upload button next to the regular upload button
-				const extIdButton = document.createElement("button");
-				extIdButton.className = "jcbyte-custom-btn";
-				extIdButton.type = "button";
+			const buttonText = document.createElement("span");
+			buttonText.textContent = "   Upload ID";
 
-				const buttonIcon = document.createElement("img");
-				buttonIcon.src = extIconSrc;
-				buttonIcon.alt = "Ipsos Extension: Upload ID";
-				buttonIcon.style = "height: 24px; width: 24px";
+			extIdButton.appendChild(buttonIcon);
+			extIdButton.appendChild(buttonText);
 
-				const buttonText = document.createElement("span");
-				buttonText.textContent = "   Upload ID";
+			extIdButton.addEventListener("click", async () => {
+				// Record the current amount of preview items uploaded (*3)
+				const innerUploadPreview = idUploadPreview.querySelector("table > tbody");
+				const existingUploadCount = innerUploadPreview?.children.length ?? 0;
 
-				extIdButton.appendChild(buttonIcon);
-				extIdButton.appendChild(buttonText);
-
-				extIdButton.addEventListener("click", async () => {
-					// Record the current amount of preview items uploaded (*3)
-					const innerUploadPreview = idUploadPreview.querySelector("table > tbody");
-					const existingUploadCount = innerUploadPreview?.children.length ?? 0;
-
-					// When clicking this custom button, set upload type as the upload window runs a separate script (separate iframe)
-					await markUploadType("id");
-					// Create the callback to close the the modal once `content-upload` has completed
-					markCompleteCallback(async () => {
-						// Wait for upload to be "confirmed" by waiting for an additional preview items to shown
-						await waitForElement(() => {
-							const innerUploadPreview = idUploadPreview.querySelector("table > tbody");
-							if ((innerUploadPreview?.children.length ?? 0) > existingUploadCount) return idUploadPreview;
-							return null;
-						});
-
-						console.log("Ipsos Extension: Upload marked as complete, closing modal.");
-						// Then close the modal
-						const closeBtn = document.querySelector<HTMLElement>(".surveyAttachmentUploadModalPopUpCloseBtn");
-						if (closeBtn) closeBtn.click();
+				// When clicking this custom button, set upload type as the upload window runs a separate script (separate iframe)
+				await markUploadType("id");
+				// Create the callback to close the the modal once `content-upload` has completed
+				markCompleteCallback(async () => {
+					// Wait for upload to be "confirmed" by waiting for an additional preview items to shown
+					await waitForElement(() => {
+						const innerUploadPreview = idUploadPreview.querySelector("table > tbody");
+						if ((innerUploadPreview?.children.length ?? 0) > existingUploadCount) return idUploadPreview;
+						return null;
 					});
 
-					// Click the original ipsos upload ID button to begin the process, `content-upload` runs in the separate modal iframe
-					idUploadButton.click();
+					console.log("Ipsos Extension: Upload marked as complete, closing modal.");
+					// Then close the modal
+					const closeBtn = document.querySelector<HTMLElement>(".surveyAttachmentUploadModalPopUpCloseBtn");
+					if (closeBtn) closeBtn.click();
 				});
-				// Place the button directly afterwards
-				idUploadButton.insertAdjacentElement("afterend", extIdButton);
-			} else {
-				console.warn("Ipsos Extension: Could not find ID upload button.");
-			}
+
+				// Click the original ipsos upload ID button to begin the process, `content-upload` runs in the separate modal iframe
+				idUploadButton.click();
+			});
+			// Place the button directly afterwards
+			idUploadButton.insertAdjacentElement("afterend", extIdButton);
+		} else {
+			console.warn("Ipsos Extension: Could not find ID upload button.");
 		}
 	}
 
