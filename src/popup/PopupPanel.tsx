@@ -4,7 +4,7 @@ import { Separator } from "@/components/ui/separator";
 import { Switch } from "@/components/ui/switch";
 import { getSetting, getSettings, setSetting } from "@/util/storage";
 import { fileToBase64 } from "@/util/util";
-import { TriangleAlert } from "lucide-react";
+import { CircleX, TriangleAlert } from "lucide-react";
 import { TargetedEvent } from "preact";
 import { useEffect, useState } from "preact/hooks";
 
@@ -76,6 +76,10 @@ export default function PopupPanel() {
 		const b64 = await fileToBase64(file);
 		setIdImage(b64);
 		await setSetting("idImage.value", b64);
+	}
+	async function clearIdImage() {
+		setIdImage(null);
+		await setSetting("idImage.value", null);
 	}
 
 	async function handleAutofillAddressToggle(checked: boolean) {
@@ -169,7 +173,6 @@ export default function PopupPanel() {
 
 				{/* ID image upload */}
 				<div className="flex flex-col gap-2">
-					{/* todo remove image + better styling */}
 					<Label htmlFor="id-image-upload">Easy-fill ID Image</Label>
 					{!idImage ? (
 						<Input
@@ -179,7 +182,16 @@ export default function PopupPanel() {
 							onChange={handleIdImageSet}
 						/>
 					) : (
-						<img src={idImage} alt="ID Image" />
+						<div className="relative group inline-block rounded-lg overflow-hidden">
+							<img src={idImage} alt="ID Image" />
+							<button
+								type="button"
+								className="absolute inset-0 flex items-center justify-center bg-black/40 text-white opacity-0 group-hover:opacity-100 transition"
+								onClick={clearIdImage}
+							>
+								<CircleX size={56} />
+							</button>
+						</div>
 					)}
 				</div>
 
