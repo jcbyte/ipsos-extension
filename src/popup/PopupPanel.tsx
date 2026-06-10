@@ -3,7 +3,9 @@ import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
 import { Switch } from "@/components/ui/switch";
 import { getSetting, getSettings, setSetting } from "@/util/storage";
+import { fileToBase64 } from "@/util/util";
 import { TriangleAlert } from "lucide-react";
+import { TargetedEvent } from "preact";
 import { useEffect, useState } from "preact/hooks";
 
 export default function PopupPanel() {
@@ -15,8 +17,7 @@ export default function PopupPanel() {
 
 	const [agreeAccuracyEnabled, setAgreeAccuracyEnabled] = useState<boolean>(false);
 
-	const [copyIdEnabled, setCopyIdEnabled] = useState<boolean>(false);
-	const [idLocation, setIdLocation] = useState<string>("");
+	const [idImage, setIdImage] = useState<string | null>(null);
 
 	const [autofillAddressEnabled, setAutofillAddressEnabled] = useState<boolean>(false);
 	const [postcode, setPostcode] = useState<string>("");
@@ -32,8 +33,7 @@ export default function PopupPanel() {
 				"date.enabled",
 				"syncDate.enabled",
 				"agreeAccuracy.enabled",
-				"idLocation.enabled",
-				"idLocation.value",
+				"idImage.value",
 				"address.enabled",
 				"address.value",
 				"dob.enabled",
@@ -43,8 +43,7 @@ export default function PopupPanel() {
 			setUseDateEnabled(settings["date.enabled"]);
 			setSyncDateEnabled(settings["syncDate.enabled"]);
 			setAgreeAccuracyEnabled(settings["agreeAccuracy.enabled"]);
-			setCopyIdEnabled(settings["idLocation.enabled"]);
-			setIdLocation(settings["idLocation.value"]);
+			setIdImage(settings["idImage.value"]);
 			setAutofillAddressEnabled(settings["address.enabled"]);
 			setPostcode(settings["address.value"].postcode);
 			setAddress(settings["address.value"].address);
@@ -69,18 +68,14 @@ export default function PopupPanel() {
 		setAgreeAccuracyEnabled(checked);
 	}
 
-	async function handleCopyIdToggle(checked: boolean) {
-		if (checked) {
-			const currentIdLocation = await getSetting("idLocation.value");
-			if (currentIdLocation) setIdLocation(currentIdLocation);
-		}
+	async function handleIdImageSet(e: TargetedEvent<HTMLInputElement>) {
+		const file = e.currentTarget.files?.[0];
+		if (!file) return;
 
-		await setSetting("idLocation.enabled", checked);
-		setCopyIdEnabled(checked);
-	}
-	async function handleIdLocationModified(newIdLocation: string) {
-		await setSetting("idLocation.value", newIdLocation);
-		setIdLocation(newIdLocation);
+		// Extract the Base64 text from the uploaded image
+		const b64 = await fileToBase64(file);
+		setIdImage(b64);
+		await setSetting("idImage.value", b64);
 	}
 
 	async function handleAutofillAddressToggle(checked: boolean) {
@@ -172,20 +167,19 @@ export default function PopupPanel() {
 					)}
 				</div>
 
-				{/* ID file location input */}
+				{/* ID image upload */}
 				<div className="flex flex-col gap-2">
-					<div className="flex items-center justify-between gap-2">
-						<Label htmlFor="id-location-toggle">Copy ID File Path on Upload</Label>
-						<Switch id="id-location-toggle" checked={copyIdEnabled} onCheckedChange={handleCopyIdToggle} />
-					</div>
-					{copyIdEnabled && (
+					{/* todo remove image + better styling */}
+					<Label htmlFor="id-image-upload">Easy-fill ID Image</Label>
+					{!idImage ? (
 						<Input
-							type="text"
-							id="id-location-input"
-							placeholder="Enter ID file path"
-							value={idLocation}
-							onChange={(e) => handleIdLocationModified((e.target as HTMLInputElement).value)}
+							type="file"
+							id="id-image-upload"
+							accept="image/png,image/jpeg,image/webp"
+							onChange={handleIdImageSet}
 						/>
+					) : (
+						<img src={idImage} alt="ID Image" />
 					)}
 				</div>
 

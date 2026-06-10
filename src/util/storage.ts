@@ -3,8 +3,7 @@ type StorageKey =
 	| "date.enabled"
 	| "syncDate.enabled"
 	| "agreeAccuracy.enabled"
-	| "idLocation.enabled"
-	| "idLocation.value"
+	| "idImage.value"
 	| "address.enabled"
 	| "address.value"
 	| "dob.enabled"
@@ -17,8 +16,7 @@ type StorageValueMap = ExactStorageMap<{
 	"date.enabled": boolean;
 	"syncDate.enabled": boolean;
 	"agreeAccuracy.enabled": boolean;
-	"idLocation.enabled": boolean;
-	"idLocation.value": string;
+	"idImage.value": string | null;
 	"address.enabled": boolean;
 	"address.value": { postcode: string; address: string };
 	"dob.enabled": boolean;
@@ -30,8 +28,7 @@ const defaultValues: StorageValueMap = {
 	"date.enabled": true,
 	"syncDate.enabled": true,
 	"agreeAccuracy.enabled": false,
-	"idLocation.enabled": false,
-	"idLocation.value": "",
+	"idImage.value": null,
 	"address.enabled": false,
 	"address.value": { postcode: "", address: "" },
 	"dob.enabled": false,

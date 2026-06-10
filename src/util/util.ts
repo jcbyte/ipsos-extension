@@ -33,3 +33,25 @@ export function waitForElement<T extends Element>(selector: string | (() => T | 
 		});
 	});
 }
+
+/**
+ * Returns the base64 representation for a given file.
+ *
+ * @param {File} file - The file to create base64 representation from.
+ * @returns {Promise<string>} A promise resolving with the base64 string.
+ */
+export function fileToBase64(file: File): Promise<string> {
+	return new Promise((resolve, reject) => {
+		const reader = new FileReader();
+		reader.onload = () => {
+			resolve(reader.result as string);
+		};
+		reader.onerror = () => {
+			reject(new Error(`Error reading file: ${file.name}`, { cause: reader.error }));
+		};
+		reader.onabort = () => {
+			reject(new Error(`Aborted reading file: ${file.name}`));
+		};
+		reader.readAsDataURL(file);
+	});
+}
