@@ -36,7 +36,6 @@ async function checkUpload() {
 			{
 				"image/jpeg": "jpg",
 				"image/png": "png",
-				"image/webp": "webp",
 			}[mime] ?? "bin";
 		const file = new File([blob], `uploaded_image.${ext}`, { type: mime });
 

@@ -175,12 +175,7 @@ export default function PopupPanel() {
 				<div className="flex flex-col gap-2">
 					<Label htmlFor="id-image-upload">Easy-fill ID Image</Label>
 					{!idImage ? (
-						<Input
-							type="file"
-							id="id-image-upload"
-							accept="image/png,image/jpeg,image/webp"
-							onChange={handleIdImageSet}
-						/>
+						<Input type="file" id="id-image-upload" accept="image/png,image/jpeg" onChange={handleIdImageSet} />
 					) : (
 						<div className="relative inline-block group rounded-lg overflow-hidden">
 							<img src={idImage} alt="ID Image" />
