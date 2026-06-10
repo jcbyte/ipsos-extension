@@ -19,8 +19,14 @@ async function checkUpload() {
 		// Convert the stored base64 image, into a blob to create a file object
 		const res = await fetch(EG_B64);
 		const blob = await res.blob();
-		// todo what if not png ( blob.type )
-		const file = new File([blob], "uploaded_image.png", { type: "image/png" });
+		const mime = blob.type || "image/png";
+		const ext =
+			{
+				"image/jpeg": "jpg",
+				"image/png": "png",
+				"image/webp": "webp",
+			}[mime] ?? "bin";
+		const file = new File([blob], `uploaded_image.${ext}`, { type: mime });
 
 		// Create a data transfer object to upload the "file" to the upload input
 		const dataTransfer = new DataTransfer();
