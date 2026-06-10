@@ -1,13 +1,14 @@
 const uploadTypeKey = "internal_.uploadType";
-type UploadType = null | "id";
+export type FullUploadType = null | "id";
+export type UploadType = Exclude<FullUploadType, null>;
 
 /**
  * Retrieve the currently marked upload type, `null` for no upload.
  */
-export async function checkUploadType(): Promise<UploadType> {
+export async function checkUploadType(): Promise<FullUploadType> {
 	// Fetch the value from local storage, with its default fallback
 	const setting = (await chrome.storage.local.get({ [uploadTypeKey]: null }))[uploadTypeKey];
-	return setting as UploadType;
+	return setting as FullUploadType;
 }
 
 /**
@@ -15,7 +16,7 @@ export async function checkUploadType(): Promise<UploadType> {
  *
  * @param value The type to upload
  */
-export async function markUploadType(value: Exclude<UploadType, null>) {
+export async function markUploadType(value: UploadType) {
 	await chrome.storage.local.set({ [uploadTypeKey]: value });
 }
 
