@@ -13,7 +13,7 @@ Ipsos Extension provides quality of life features and automates parts of form fi
 - Autofill Current Date & Time
 - Sync Date & Time Fields Across the Form
 - Auto-Agree to Accuracy Statement
-- Copy ID File Path Before You Select It
+- Easy Upload ID Image
 - Autofill Postcode & Address
 - Calculate & Autofill Age Fields
 

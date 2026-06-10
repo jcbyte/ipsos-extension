@@ -182,15 +182,14 @@ export default function PopupPanel() {
 							onChange={handleIdImageSet}
 						/>
 					) : (
-						<div className="relative group inline-block rounded-lg overflow-hidden">
+						<div className="relative inline-block group rounded-lg overflow-hidden">
 							<img src={idImage} alt="ID Image" />
-							<button
-								type="button"
+							<div
 								className="absolute inset-0 flex items-center justify-center bg-black/40 text-white opacity-0 group-hover:opacity-100 transition"
 								onClick={clearIdImage}
 							>
 								<CircleX size={56} />
-							</button>
+							</div>
 						</div>
 					)}
 				</div>

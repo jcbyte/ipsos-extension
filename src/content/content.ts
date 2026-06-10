@@ -1,7 +1,6 @@
 import { getSetting, getSettings } from "@/util/storage";
 import { waitForElement } from "@/util/util";
 import DateDiff from "date-diff";
-import extIconSrc from "../../public/icons/icon48.png?url";
 import { markCompleteCallback, markUploadComplete, markUploadType } from "../util/mark-upload";
 import "./content.css";
 
@@ -366,7 +365,7 @@ async function autofill() {
 			extIdButton.type = "button";
 
 			const buttonIcon = document.createElement("img");
-			buttonIcon.src = extIconSrc;
+			buttonIcon.src = chrome.runtime.getURL("icons/icon48.png");
 			buttonIcon.alt = "Ipsos Extension: Upload ID";
 			buttonIcon.style = "height: 24px; width: 24px";
 

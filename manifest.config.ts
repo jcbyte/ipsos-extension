@@ -30,4 +30,10 @@ export default defineManifest({
 		},
 	],
 	permissions: ["storage"],
+	web_accessible_resources: [
+		{
+			resources: ["icons/*"],
+			matches: ["<all_urls>"],
+		},
+	],
 });
