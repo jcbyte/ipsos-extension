@@ -2,7 +2,7 @@ import { getSetting, getSettings } from "@/util/storage";
 import { waitForElement } from "@/util/util";
 import DateDiff from "date-diff";
 import extIconSrc from "../../public/icons/icon48.png?url";
-import { markCompleteCallback, markUploadType } from "../util/mark-upload";
+import { markCompleteCallback, markUploadComplete, markUploadType } from "../util/mark-upload";
 import "./content.css";
 
 async function awaitForm() {
@@ -22,6 +22,9 @@ async function awaitForm() {
 	// Once everything is loaded then fill it
 	window.addEventListener("load", () => {
 		console.log("Ipsos Extension: DOM loaded, filling now.");
+		// Mark the upload type as "complete" to reset it, if it was not reset in a previous run
+		markUploadComplete();
+		// Perform auto-filling, and adding custom elements
 		autofill();
 	});
 }
